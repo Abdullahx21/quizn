@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>بنك أسئلة الأدلة الجنائية الرقمية — Digital Forensics</title>
+<style>
+:root{--ink:#111;--muted:#4a5568;--line:#d5dae1;--accent:#0b5cad;--ok:#0a7a3d;--okbg:#eaf7ef;--rabt:#7a4b00;--rabtbg:#fff6df;--note:#fff;}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{margin:0;background:#fff;color:var(--ink);font-family:"Segoe UI",Tahoma,"Noto Naskh Arabic","Noto Sans Arabic",Arial,sans-serif;font-size:20px;line-height:1.8}
+.wrap{max-width:920px;margin:0 auto;padding:18px 14px 90px}
+h1{font-size:28px;line-height:1.5;margin:6px 0 6px}
+.sub{color:var(--muted);font-size:18px;margin:0 0 14px}
+.info{border:2px solid var(--line);border-radius:14px;padding:12px 16px;margin:12px 0;background:#fafbfc}
+.info b{color:var(--accent)}
+.en{direction:ltr;text-align:right;unicode-bidi:isolate;overflow-wrap:anywhere}
+.ar{direction:rtl;text-align:right;unicode-bidi:isolate;overflow-wrap:anywhere}
+#qbar{position:sticky;top:0;z-index:100;background:#fff;border-bottom:2px solid var(--line);box-shadow:0 2px 8px rgba(0,0,0,.08)}
+#qbar .row{display:flex;gap:6px;align-items:center;overflow-x:auto;overflow-y:hidden;white-space:nowrap;padding:8px 10px;-webkit-overflow-scrolling:touch;scrollbar-width:thin;direction:rtl}
+#qbar a{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;min-width:42px;height:42px;padding:0 8px;border:2px solid var(--accent);border-radius:11px;color:var(--accent);text-decoration:none;font-weight:700;font-family:Arial,sans-serif;font-size:18px;background:#fff;line-height:1}
+#qbar a.grp{background:#eaf0f7;border-color:#9db7d5;color:#0b3d73;font-size:15px;min-width:44px;margin-inline-start:8px}
+#qbar a.grp:first-child{margin-inline-start:0}
+#qbar a.active{background:var(--accent);color:#fff}
+#qbar a:active{background:var(--accent);color:#fff}
+.q,h2.sec{scroll-margin-top:72px}
+.tools{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0}
+.tools button{font:inherit;font-size:18px;padding:10px 16px;border-radius:12px;border:2px solid var(--accent);background:#fff;color:var(--accent);font-weight:700;cursor:pointer}
+.tools button:active{background:var(--accent);color:#fff}
+h2.sec{font-size:23px;line-height:1.6;margin:38px 0 8px;padding:10px 14px;border-right:7px solid var(--accent);background:#f2f7fc;border-radius:10px}
+.q{border:2px solid var(--line);border-radius:16px;padding:16px;margin:18px 0;background:#fff}
+.qhead{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px}
+.num{background:var(--accent);color:#fff;border-radius:999px;padding:1px 16px;font-weight:700;font-family:Arial,sans-serif}
+.top{font-size:16px;color:var(--accent);text-decoration:none}
+.qtext .en{font-weight:700;font-size:21px}
+.qtext .ar{color:#1b3a57;margin-top:4px}
+.opt{display:flex;gap:12px;align-items:flex-start;border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;margin:10px 0;background:#fff}
+.letter{flex:0 0 auto;width:38px;height:38px;border-radius:50%;background:#eaf0f7;color:#0b3d73;display:flex;align-items:center;justify-content:center;font-weight:700;font-family:Arial,sans-serif;margin-top:2px}
+.otext{flex:1;min-width:0}
+.otext .ar{color:#1b3a57;font-size:19px}
+.noopt{border:2px dashed #c9a227;background:#fffbea;border-radius:12px;padding:10px 14px;margin:10px 0;font-size:18px}
+details.ans{margin-top:14px}
+details.ans>summary{cursor:pointer;list-style:none;background:var(--accent);color:#fff;padding:13px 16px;border-radius:12px;font-weight:700;text-align:center;font-size:20px;user-select:none;-webkit-tap-highlight-color:transparent}
+details.ans>summary::-webkit-details-marker{display:none}
+details.ans[open]>summary{background:#4a5568}
+details.ans[open] .t1{display:none}
+details.ans:not([open]) .t2{display:none}
+.reveal{border:2px solid var(--ok);background:var(--okbg);border-radius:12px;padding:12px 14px;margin-top:10px}
+.reveal .lbl{display:block;font-weight:700;color:var(--ok);margin:8px 0 2px;font-size:19px}
+.reveal .lbl:first-child{margin-top:0}
+.correct{border:2px solid var(--ok);background:#fff;border-radius:10px;padding:8px 12px}
+.correct .en{font-weight:700}
+.correct .ar{color:#14532d}
+.exp{margin:0}
+.rabt{border:2px solid #e0b64a;background:var(--rabtbg);border-radius:10px;padding:8px 12px;margin-top:6px}
+.rabt .lbl{color:var(--rabt)!important}
+.src{margin-top:8px;font-size:16px;color:var(--muted)}
+.notes{margin-top:36px}
+.notes ul{padding:0 22px 0 0;margin:6px 0}
+.notes li{margin:6px 0}
+@media (max-width:520px){body{font-size:19px}.qtext .en{font-size:20px}h1{font-size:24px}}
+</style>
+</head>
+<body>
+<nav id="qbar" aria-label="أرقام الأسئلة"><div class="row" id="qrow"><a class="grp" href="#sec1">م1</a><a href="#q1">1</a><a href="#q2">2</a><a href="#q3">3</a><a href="#q4">4</a><a href="#q5">5</a><a href="#q6">6</a><a href="#q7">7</a><a href="#q8">8</a><a href="#q9">9</a><a href="#q10">10</a><a href="#q11">11</a><a href="#q12">12</a><a href="#q13">13</a><a href="#q14">14</a><a href="#q15">15</a><a class="grp" href="#sec2">م2</a><a href="#q16">16</a><a href="#q17">17</a><a href="#q18">18</a><a href="#q19">19</a><a href="#q20">20</a><a href="#q21">21</a><a href="#q22">22</a><a href="#q23">23</a><a href="#q24">24</a><a href="#q25">25</a><a class="grp" href="#sec3">م3</a><a href="#q26">26</a><a href="#q27">27</a><a href="#q28">28</a><a href="#q29">29</a><a href="#q30">30</a><a href="#q31">31</a><a href="#q32">32</a><a href="#q33">33</a><a href="#q34">34</a><a href="#q35">35</a><a href="#q36">36</a><a href="#q37">37</a><a class="grp" href="#sec4">م4-1</a><a href="#q38">38</a><a href="#q39">39</a><a href="#q40">40</a><a href="#q41">41</a><a href="#q42">42</a><a href="#q43">43</a><a href="#q44">44</a><a class="grp" href="#sec5">م4-2</a><a href="#q45">45</a><a href="#q46">46</a><a href="#q47">47</a><a href="#q48">48</a></div></nav>
+<div class="wrap" id="top">
+ <h1>بنك أسئلة الأدلة الجنائية الرقمية<br><span class="en" style="font-size:20px;font-weight:400">Digital Forensics Question Bank</span></h1>
+ <p class="sub">48 سؤالاً بدون تكرار، من المحاضرات 1 إلى 5</p>
+ <div class="info ar">
+  <b>طريقة الاستخدام:</b> اقرأ السؤال والخيارات، فكّر في إجابتك، ثم اضغط زر «اضغط لإظهار الإجابة الصحيحة» لترى الإجابة والشرح من الشابتر وربطاً يسهّل الحفظ.<br>
+  <b>الشريط العلوي ثابت:</b> اضغط على رقم أي سؤال (أو على م1، م2... للانتقال إلى المحاضرة) وسيبقى الشريط ظاهراً وهو يتتبّع السؤال الذي تقرؤه.<br>
+  <b>الوقت التقديري للمراجعة لقارئ للمرة الأولى:</b> من 60 إلى 75 دقيقة تقريباً.
+ </div>
+ <div class="tools">
+  <button type="button" id="showAll">إظهار كل الإجابات</button>
+  <button type="button" id="hideAll">إخفاء كل الإجابات</button>
+ </div>
+ <h2 class="sec" id="sec1">المحاضرة 1 — Introduction to Digital Forensics (مقدمة في الأدلة الجنائية الرقمية)</h2>
+
+<section class="q" id="q1">
+ <div class="qhead"><span class="num">السؤال 1</span><a class="top" href="#top">↑ للأعلى</a></div>
+ <div class="qtext"><div class="en">Cybercrime includes:</div><div class="ar">الجريمة الإلكترونية (Cybercrime) تشمل:</div></div>
+ <div class="opt"><span class="letter">A</span><div class="otext"><div class="en">Any illegal activity committed using a computing device or computer network</div><div class="ar">أي نشاط غير قانوني يُرتكب باستخدام جهاز حاسوبي أو شبكة حاسوب</div></div></div><div class="opt"><span class="letter">B</span><div class="otext"><div class="en">Only crimes involving stolen physical computers</div><div class="ar">فقط الجرائم التي تتضمن سرقة أجهزة حاسوب مادية</div></div></div><div class="opt"><span class="letter">C</span><div class="otext"><div class="en">Only attacks against government networks</div><div class="ar">فقط الهجمات ضد شبكات الحكومة</div></div></div><div class="opt"><span class="letter">D</span><div class="otext"><div class="en">Any legal activity performed over the Internet</div><div class="ar">أي نشاط قانوني يتم عبر الإنترنت</div></div></div>
+ <details class="ans">
+  <summary><span class="t1">اضغط لإظهار الإجابة الصحيحة</span><span class="t2">إخفاء الإجابة</span></summary>
+  <div class="reveal">
+   <span class="lbl">الإجابة الصحيحة</span>
+   <div class="correct"><div class="en">A. Any illegal activity committed using a computing device or computer network</div><div class="ar">الخيار A: أي نشاط غير قانوني يُرتكب باستخدام جهاز حاسوبي أو شبكة حاسوب</div></div>
+   <span class="lbl">الشرح من الشابتر</span>
+   <p class="exp ar">تعرّف المحاضرة الجريمة الإلكترونية بأنها أي نشاط غير قانوني يُرتكب باستخدام نوع من الأجهزة الحاسوبية أو شبكات الحاسوب مثل الإنترنت. فهي لا تقتصر على سرقة الأجهزة ولا على شبكات الحكومة، والنشاط القانوني ليس جريمة أصلاً.</p>
+   <div class="rabt"><span class="lbl">ربط للفهم والحفظ</span><div class="ar">كلمة «أي» هي المفتاح: أي جريمة + جهاز أو شبكة = جريمة إلكترونية. الخيارات الخاطئة تبدأ بـ «فقط» فتحصر المعنى.</div></div>
+   <div class="src ar">المصدر: المحاضرة 1 — شريحة 3</div>
+  </div>
+ </details>
+</section>
+
+<section class="q" id="q2">
+ <div class="qhead"><span class="num">السؤال 2</span><a class="top" href="#top">↑ للأعلى</a></div>
+ <div class="qtext"><div class="en">Malware is best described as:</div><div class="ar">البرمجيات الخبيثة (Malware) توصف على أنها:</div></div>
+ <div class="opt"><span class="letter">A</span><div class="otext"><div class="en">Software employed to damage computing devices or stored content</div><div class="ar">برنامج يُستخدم لإلحاق الضرر بالأجهزة الحاسوبية أو بالمحتوى المخزَّن عليها</div></div></div><div class="opt"><span class="letter">B</span><div class="otext"><div class="en">Hardware used for forensic analysis</div><div class="ar">عتاد (Hardware) يُستخدم في التحليل الجنائي</div></div></div><div class="opt"><span class="letter">C</span><div class="otext"><div class="en">A protocol used to encrypt web traffic</div><div class="ar">بروتوكول يُستخدم لتشفير حركة الويب</div></div></div><div class="opt"><span class="letter">D</span><div class="otext"><div class="en">An official legal document used in court</div><div class="ar">وثيقة قانونية رسمية تُستخدم في المحكمة</div></div></div>
+ <details class="ans">
+  <summary><span class="t1">اضغط لإظهار الإجابة الصحيحة</span><span class="t2">إخفاء الإجابة</span></summary>
+  <div class="reveal">
+   <span class="lbl">الإجابة الصحيحة</span>
+   <div class="correct"><div class="en">A. Software employed to damage computing devices or stored content</div><div class="ar">الخيار A: برنامج يُستخدم لإلحاق الضرر بالأجهزة الحاسوبية أو بالمحتوى المخزَّن عليها</div></div>
+   <span class="lbl">الشرح من الشابتر</span>
+   <p class="exp ar">Malware اختصار «malicious software» أي البرنامج الخبيث، وهو أي برنامج يُستخدم لإحداث ضرر بالأجهزة (حواسيب، هواتف ذكية...) أو بالمحتوى المخزَّن عليها (بيانات أو تطبيقات).</p>
+   <div class="rabt"><span class="lbl">ربط للفهم والحفظ</span><div class="ar">Malware = Malicious + Software، أي «برنامج خبيث». الاسم نفسه يعطيك الإجابة.</div></div>
+   <div class="src ar">المصدر: المحاضرة 1 — شريحة 8</div>
+  </div>
+ </details>
+</section>
+
+<section class="q" id="q3">
+ <div class="qhead"><span class="num">السؤال 3</span><a class="top" href="#top">↑ للأعلى</a></div>
+ <div class="qtext"><div class="en">Hacking is described as gaining unauthorized access to:</div><div class="ar">الاختراق (Hacking) يوصف بأنه الحصول على وصول غير مصرّح به إلى:</div></div>
+ <div class="opt"><span class="letter">A</span><div class="otext"><div class="en">A computing device or internal network</div><div class="ar">جهاز حاسوبي أو شبكة داخلية</div></div></div><div class="opt"><span class="letter">B</span><div class="otext"><div class="en">Only a public website homepage</div><div class="ar">فقط الصفحة الرئيسية لموقع عام</div></div></div><div class="opt"><span class="letter">C</span><div class="otext"><div class="en">Only an e-mail inbox with permission</div><div class="ar">فقط صندوق بريد إلكتروني بإذن</div></div></div><div class="opt"><span class="letter">D</span><div class="otext"><div class="en">A legally authorized forensic image</div><div class="ar">صورة جنائية مصرّح بها قانونياً</div></div></div>
+ <details class="ans">
+  <summary><span class="t1">اضغط لإظهار الإجابة الصحيحة</span><span class="t2">إخفاء الإجابة</span></summary>
+  <div class="reveal">
+   <span class="lbl">الإجابة الصحيحة</span>
+   <div class="correct"><div class="en">A. A computing device or internal network</div><div class="ar">الخيار A: جهاز حاسوبي أو شبكة داخلية</div></div>
+   <span class="lbl">الشرح من الشابتر</span>
+   <p class="exp ar">الاختراق هو انتهاك خصوصيتك بالحصول على وصول غير مصرّح به إلى جهازك الحاسوبي أو شبكتك الداخلية، ويقوم المخترقون عادةً بمسح الأجهزة بحثاً عن ثغرات والدخول عبرها. الخياران C وD فيهما «بإذن» و«مصرّح بها قانونياً» وهذا يناقض معنى «غير مصرّح».</p>
+   <div class="rabt"><span class="lbl">ربط للفهم والحفظ</span><div class="ar">Hacking = دخول بلا إذن إلى جهاز أو شبكة. أي خيار فيه كلمة «بإذن» أو «مصرّح» فهو خطأ فوراً.</div></div>
+   <div class="src ar">المصدر: المحاضرة 1 — شريحة 9</div>
+  </div>
+ </details>
+</section>
+
+<section class="q" id="q4">
+ <div class="qhead"><span class="num">السؤال 4</span><a class="top" href="#top">↑ للأعلى</a></div>
+ <div class="qtext"><div class="en">Which of the following is listed as a main motivation behind cybercrime?</div><div class="ar">أيٌّ مما يلي مدرج كأحد الدوافع الرئيسية وراء الجريمة الإلكترونية؟</div></div>
+ <div class="opt"><span class="letter">A</span><div class="otext"><div class="en">Stealing confidential data</div><div class="ar">سرقة البيانات السرية</div></div></div><div class="opt"><span class="letter">B</span><div class="otext"><div class="en">Improving network availability</div><div class="ar">تحسين توفّر الشبكة</div></div></div><div class="opt"><span class="letter">C</span><div class="otext"><div class="en">Reducing software costs</div><div class="ar">تقليل تكاليف البرمجيات</div></div></div><div class="opt"><span class="letter">D</span><div class="otext"><div class="en">Increasing employee productivity</div><div class="ar">زيادة إنتاجية الموظفين</div></div></div>
+ <details class="ans">
+  <summary><span class="t1">اضغط لإظهار الإجابة الصحيحة</span><span class="t2">إخفاء الإجابة</span></summary>
+  <div class="reveal">
+   <span class="lbl">الإجابة الصحيحة</span>
+   <div class="correct"><div class="en">A. Stealing confidential data</div><div class="ar">الخيار A: سرقة البيانات السرية</div></div>
+   <span class="lbl">الشرح من الشابتر</span>
+   <p class="exp ar">الدوافع الرئيسية المذكورة في المحاضرة: دافع مالي، تعطيل الخدمة (مثل هجمات DDoS)، سرقة البيانات السرية (بيانات المستهلكين والمعلومات الطبية)، تبادل مواد محمية بحقوق النشر بطريقة غير قانونية، والتجسس الإلكتروني. الخيارات الأخرى أهداف إيجابية ليست دوافع إجرامية.</p>
+   <div class="rabt"><span class="lbl">ربط للفهم والحفظ</span><div class="ar">دوافع المجرم: يريد مالاً، أو يعطّل خدمة، أو يسرق سراً، أو يقرصن، أو يتجسس. أما تحسين وتقليل وزيادة (B وC وD) فكلها أمور إيجابية لا يقوم بها مجرم.</div></div>
+   <div class="src ar">المصدر: المحاضرة 1 — شريحة 4</div>
+  </div>
+ </details>
+</section>
+
+<section class="q" id="q5">
+ <div class="qhead"><span class="num">السؤال 5</span><a class="top" href="#top">↑ للأعلى</a></div>
+ <div class="qtext"><div class="en">Insider attacks can originate from:</div><div class="ar">الهجمات الداخلية (Insider attacks) يمكن أن تنشأ من:</div></div>
+ <div class="opt"><span class="letter">A</span><div class="otext"><div class="en">Employees, former employees, or third-party contractors</div><div class="ar">الموظفين أو الموظفين السابقين أو المتعاقدين من أطراف خارجية</div></div></div><div class="opt"><span class="letter">B</span><div class="otext"><div class="en">Only anonymous Internet users</div><div class="ar">فقط مستخدمي الإنترنت المجهولين</div></div></div><div class="opt"><span class="letter">C</span><div class="otext"><div class="en">Only law enforcement officers</div><div class="ar">فقط ضباط إنفاذ القانون</div></div></div><div class="opt"><span class="letter">D</span><div class="otext"><div class="en">Only software vendors</div><div class="ar">فقط موردي البرمجيات</div></div></div>
+ <details class="ans">
+  <summary><span class="t1">اضغط لإظهار الإجابة الصحيحة</span><span class="t2">إخفاء الإجابة</span></summary>
+  <div class="reveal">
+   <span class="lbl">الإجابة الصحيحة</span>
+   <div class="correct"><div class="en">A. Employees, former employees, or third-party contractors</div><div class="ar">الخيار A: الموظفين أو الموظفين السابقين أو المتعاقدين من أطراف خارجية</div></div>
+   <span class="lbl">الشرح من الشابتر</span>
+   <p class="exp ar">الهجوم الداخلي هو أخطر المخاطر الإلكترونية على المؤسسات اليوم لأنه قد يستمر مدة طويلة دون أن تكتشفه، وينتج عن خرق الثقة من الموظفين أو من أشخاص مثل الموظفين السابقين والمتعاقدين من أطراف خارجية.</p>
+   <div class="rabt"><span class="lbl">ربط للفهم والحفظ</span><div class="ar">Insider = «من الداخل» = أشخاص وثقتَ بهم (موظف، موظف سابق، متعاقد). الكلمة المفتاحية: خرق الثقة.</div></div>
+   <div class="src ar">المصدر: المحاضرة 1 — شريحة 5</div>
+  </div>
+ </details>
+</section>
+
+<section class="q" id="q6">
+ <div class="qhead"><span class="num">السؤال 6</span><a class="top" href="#top">↑ للأعلى</a></div>
+ <div class="qtext"><div class="en">An external attack originates:</div><div class="ar">الهجوم الخارجي (External attack) ينشأ:</div></div>
+ <div class="opt"><span class="letter">A</span><div class="otext"><div class="en">From outside the target organization</div><div class="ar">من خارج المؤسسة المستهدفة</div></div></div><div class="opt"><span class="letter">B</span><div class="otext"><div class="en">Only from current employees</div><div class="ar">فقط من الموظفين الحاليين</div></div></div><div class="opt"><span class="letter">C</span><div class="otext"><div class="en">Only from the organization&#x27;s database</div><div class="ar">فقط من قاعدة بيانات المؤسسة</div></div></div><div class="opt"><span class="letter">D</span><div class="otext"><div class="en">From authorized internal administrators only</div><div class="ar">من مديري النظام الداخليين المصرّح لهم فقط</div></div></div>
+ <details class="ans">
+  <summary><span class="t1">اضغط لإظهار الإجابة الصحيحة</span><span class="t2">إخفاء الإجابة</span></summary>
+  <div class="reveal">
+   <span class="lbl">الإجابة الصحيحة</span>
+   <div class="correct"><div class="en">A. From outside the target organization</div><div class="ar">الخيار A: من خارج المؤسسة المستهدفة</div></div>
+   <span class="lbl">الشرح من الشابتر</span>
+   <p class="exp ar">الهجوم الخارجي ينشأ من خارج المؤسسة المستهدفة، وغالباً من مخترقين مهرة، وهو يشكّل أكبر الهجمات ضد المؤسسات حول العالم. وأحياناً يحصل المهاجم الخارجي على معلومات عن أنظمة الأمان من موظف داخلي ليسهّل دخوله.</p>
+   <div class="rabt"><span class="lbl">ربط للفهم والحفظ</span><div class="ar">External = Ex = «خارج». والعكس Insider = داخل. الخيارات B وC وD كلها «داخلية» فهي خطأ.</div></div>
+   <div class="src ar">المصدر: المحاضرة 1 — شريحة 6</div>
+  </div>
+ </details>
+</section>
+
+<section class="q" id="q7">
+ <div class="qhead"><span class="num">السؤال 7</span><a class="top" href="#top">↑ للأعلى</a></div>
+ <div class="qtext"><div class="en">In a SQL injection attack, the attacker enters SQL code into:</div><div class="ar">في هجوم حقن SQL (SQL injection) يقوم المهاجم بإدخال شيفرة SQL في:</div></div>
+ <div class="opt"><span class="letter">A</span><div class="otext"><div class="en">Target website web forms</div><div class="ar">نماذج الويب (Web forms) في الموقع المستهدف</div></div></div><div class="opt"><span class="letter">B</span><div class="otext"><div class="en">A biometric access reader</div><div class="ar">قارئ دخول بالبصمة الحيوية</div></div></div><div class="opt"><span class="letter">C</span><div class="otext"><div class="en">A Faraday bag</div><div class="ar">كيس فاراداي</div></div></div><div class="opt"><span class="letter">D</span><div class="otext"><div class="en">A physical evidence cabinet</div><div class="ar">خزانة الأدلة المادية</div></div></div>
+ <details class="ans">
+  <summary><span class="t1">اضغط لإظهار الإجابة الصحيحة</span><span class="t2">إخفاء الإجابة</span></summary>
+  <div class="reveal">
+   <span class="lbl">الإجابة الصحيحة</span>
+   <div class="correct"><div class="en">A. Target website web forms</div><div class="ar">الخيار A: نماذج الويب (Web forms) في الموقع المستهدف</div></div>
+   <span class="lbl">الشرح من الشابتر</span>
+   <p class="exp ar">يدخل المهاجم شيفرة SQL في نماذج الويب للموقع المستهدف وينفذها ليجبر قاعدة البيانات الخلفية (Back-end database) على تسريب معلومات سرية له. باقي الخيارات أدوات مادية لا علاقة لها بالمواقع.</p>
+   <div class="rabt"><span class="lbl">ربط للفهم والحفظ</span><div class="ar">SQL → Forms: تكتب أمر SQL في خانة (نموذج) الموقع فتخرج الأسرار من قاعدة البيانات.</div></div>
+   <div class="src ar">المصدر: المحاضرة 1 — شريحة 10</div>
+  </div>
+ </details>
+</section>
+
+<section class="q" id="q8">
+ <div class="qhead"><span class="num">السؤال 8</span><a class="top" href="#top">↑ للأعلى</a></div>
+ <div class="qtext"><div class="en">Phishing messages may appear as:</div><div class="ar">رسائل التصيّد الاحتيالي (Phishing) قد تظهر على شكل:</div></div>
+ <div class="opt"><span class="letter">A</span><div class="otext"><div class="en">SMS messages, e-mails, or website links</div><div class="ar">رسائل نصية SMS أو بريد إلكتروني أو روابط مواقع</div></div></div><div class="opt"><span class="letter">B</span><div class="otext"><div class="en">Only printed letters</div><div class="ar">فقط رسائل مطبوعة</div></div></div><div class="opt"><span class="letter">C</span><div class="otext"><div class="en">Only encrypted database files</div><div class="ar">فقط ملفات قواعد بيانات مشفّرة</div></div></div><div class="opt"><span class="letter">D</span><div class="otext"><div class="en">Only telephone hardware failures</div><div class="ar">فقط أعطال في عتاد الهاتف</div></div></div>
+ <details class="ans">
+  <summary><span class="t1">اضغط لإظهار الإجابة الصحيحة</span><span class="t2">إخفاء الإجابة</span></summary>
+  <div class="reveal">
+   <span class="lbl">الإجابة الصحيحة</span>
+   <div class="correct"><div class="en">A. SMS messages, e-mails, or website links</div><div class="ar">الخيار A: رسائل نصية SMS أو بريد إلكتروني أو روابط مواقع</div></div>
+   <span class="lbl">الشرح من الشابتر</span>
+   <p class="exp ar">رسائل التصيّد تأتي بأشكال مختلفة: رسائل SMS وبريد إلكتروني وروابط مواقع (URLs)، وكلها مصمّمة لتبدو حقيقية وبنفس تنسيق الشركة الشرعية التي تنتحل صفتها.</p>
+   <div class="rabt"><span class="lbl">ربط للفهم والحفظ</span><div class="ar">Phishing = «صيد بالسنارة»: الطُّعم يصلك عبر الجوال (SMS) أو البريد أو رابط.</div></div>
+   <div class="src ar">المصدر: المحاضرة 1 — شريحة 11</div>
+  </div>
+ </details>
+</section>
+
+<section class="q" id="q9">
+ <div class="qhead"><span class="num">السؤال 9</span><a class="top" href="#top">↑ للأعلى</a></div>
+ <div class="qtext"><div class="en">A DDoS attack attempts to make an online service unavailable by:</div><div class="ar">يحاول هجوم DDoS جعل الخدمة الإلكترونية غير متاحة عن طريق:</div></div>
+ <div class="opt"><span class="letter">A</span><div class="otext"><div class="en">Overwhelming it with traffic from multiple sources</div><div class="ar">إغراقها بحركة مرور قادمة من مصادر متعددة</div></div></div><div class="opt"><span class="letter">B</span><div class="otext"><div class="en">Encrypting one local file</div><div class="ar">تشفير ملف محلي واحد</div></div></div><div class="opt"><span class="letter">C</span><div class="otext"><div class="en">Physically removing a server</div><div class="ar">إزالة خادم بشكل مادي</div></div></div><div class="opt"><span class="letter">D</span><div class="otext"><div class="en">Changing a user&#x27;s password</div><div class="ar">تغيير كلمة مرور مستخدم</div></div></div>
+ <details class="ans">
+  <summary><span class="t1">اضغط لإظهار الإجابة الصحيحة</span><span class="t2">إخفاء الإجابة</span></summary>
+  <div class="reveal">
+   <span class="lbl">الإجابة الصحيحة</span>
+   <div class="correct"><div class="en">A. Overwhelming it with traffic from multiple sources</div><div class="ar">الخيار A: إغراقها بحركة مرور قادمة من مصادر متعددة</div></div>
+   <span class="lbl">الشرح من الشابتر</span>
+   <p class="exp ar">هجوم DDoS محاولة لجعل الخدمة غير متاحة بإغراقها بحركة مرور من مصادر متعددة. يبني المهاجمون شبكات من الأجهزة المصابة تُسمى Botnets (قد تصل لملايين الأجهزة) ويتحكم بها «bot master» عن بُعد دون علم أصحابها.</p>
+   <div class="rabt"><span class="lbl">ربط للفهم والحفظ</span><div class="ar">DDoS = Distributed (موزّع): جيش من الأجهزة المصابة يهاجم الخدمة نفسها معاً فتنهار من الزحام.</div></div>
+   <div class="src ar">المصدر: المحاضرة 1 — شريحة 13</div>
+  </div>
+ </details>
+</section>
+
+<section class="q" id="q10">
+ <div class="qhead"><span class="num">السؤال 10</span><a class="top" href="#top">↑ للأعلى</a></div>
+ <div class="qtext"><div class="en">Which type of attack involves tricking users into revealing sensitive credentials by impersonating a trusted entity?</div><div class="ar">أي نوع من الهجمات يتضمن خداع المستخدمين لكشف بيانات اعتماد حساسة عن طريق انتحال صفة جهة موثوقة؟</div></div>
+ <div class="opt"><span class="letter">A</span><div class="otext"><div class="en">Social Engineering / Phishing</div><div class="ar">الهندسة الاجتماعية / التصيّد الاحتيالي</div></div></div><div class="opt"><span class="letter">B</span><div class="otext"><div class="en">Buffer Overflow</div><div class="ar">فيضان المخزن المؤقت (Buffer Overflow)</div></div></div><div class="opt"><span class="letter">C</span><div class="otext"><div class="en">Port Scanning</div><div class="ar">مسح المنافذ (Port Scanning)</div></div></div><div class="opt"><span class="letter">D</span><div class="otext"><div class="en">Physical Theft</div><div class="ar">السرقة المادية</div></div></div>
+ <details class="ans">
+  <summary><span class="t1">اضغط لإظهار الإجابة الصحيحة</span><span class="t2">إخفاء الإجابة</span></summary>
+  <div class="reveal">
+   <span class="lbl">الإجابة الصحيحة</span>
+   <div class="correct"><div class="en">A. Social Engineering / Phishing</div><div class="ar">الخيار A: الهندسة الاجتماعية / التصيّد الاحتيالي</div></div>
+   <span class="lbl">الشرح من الشابتر</span>
+   <p class="exp ar">الهندسة الاجتماعية تستخدم حيلاً نفسية (عبر الهاتف أو جهاز حاسوبي) لإقناع شخص بتسليم معلومات حساسة عنه أو عن مؤسسته وأنظمتها، والتصيّد رسائل مصمّمة لتبدو كأنها من شركة شرعية. (الخياران B وC غير مذكورين في الشرائح، وهما هجمات تقنية لا تعتمد على خداع الشخص، وD سرقة مادية لا خداع فيها.)</p>
+   <div class="rabt"><span class="lbl">ربط للفهم والحفظ</span><div class="ar">Social = اجتماعي: الهجوم يستهدف «الإنسان» لا الثغرة التقنية. كلمة المفتاح: خداع + انتحال جهة موثوقة.</div></div>
+   <div class="src ar">المصدر: المحاضرة 1 — الشريحتان 11 و14</div>
+  </div>
+ </details>
+</section>
+
+<section class="q" id="q11">
+ <div class="qhead"><span class="num">السؤال 11</span><a class="top" href="#top">↑ للأعلى</a></div>
+ <div class="qtext"><div class="en">Digital forensics is a branch of forensic science that uses scientific knowledge to:</div><div class="ar">الأدلة الجنائية الرقمية (Digital forensics) فرع من العلوم الجنائية يستخدم المعرفة العلمية من أجل:</div></div>
+ <div class="opt"><span class="letter">A</span><div class="otext"><div class="en">Collect, analyze, document, and present digital evidence</div><div class="ar">جمع الأدلة الرقمية وتحليلها وتوثيقها وعرضها</div></div></div><div class="opt"><span class="letter">B</span><div class="otext"><div class="en">Design new operating systems</div><div class="ar">تصميم أنظمة تشغيل جديدة</div></div></div><div class="opt"><span class="letter">C</span><div class="otext"><div class="en">Develop commercial websites</div><div class="ar">تطوير مواقع تجارية</div></div></div><div class="opt"><span class="letter">D</span><div class="otext"><div class="en">Replace all physical evidence</div><div class="ar">استبدال جميع الأدلة المادية</div></div></div>
+ <details class="ans">
+  <summary><span class="t1">اضغط لإظهار الإجابة الصحيحة</span><span class="t2">إخفاء الإجابة</span></summary>
+  <div class="reveal">
+   <span class="lbl">الإجابة الصحيحة</span>
+   <div class="correct"><div class="en">A. Collect, analyze, document, and present digital evidence</div><div class="ar">الخيار A: جمع الأدلة الرقمية وتحليلها وتوثيقها وعرضها</div></div>
+   <span class="lbl">الشرح من الشابتر</span>
+   <p class="exp ar">التعريف: Digital forensics فرع من العلوم الجنائية يستخدم المعرفة العلمية لجمع الأدلة الرقمية المتعلقة بجرائم الحاسوب وتحليلها وتوثيقها وعرضها، لاستخدامها في المحكمة.</p>
+   <div class="rabt"><span class="lbl">ربط للفهم والحفظ</span><div class="ar">الأفعال الأربعة: جمع ← تحليل ← توثيق ← عرض (ج ت و ع). الخيارات الأخرى لا علاقة لها بالتحقيق.</div></div>
+   <div class="src ar">المصدر: المحاضرة 1 — شريحة 16</div>
+  </div>
+ </details>
+</section>
+
+<section class="q" id="q12">
+ <div class="qhead"><span class="num">السؤال 12</span><a class="top" href="#top">↑ للأعلى</a></div>
+ <div class="qtext"><div class="en">Which digital forensics category focuses on monitoring and analyzing traffic flow in computer networks?</div><div class="ar">أي فئة من فئات الأدلة الجنائية الرقمية تركّز على مراقبة وتحليل تدفق حركة المرور في شبكات الحاسوب؟</div></div>
+ <div class="opt"><span class="letter">A</span><div class="otext"><div class="en">Network forensics</div><div class="ar">التحقيق الجنائي للشبكات (Network forensics)</div></div></div><div class="opt"><span class="letter">B</span><div class="otext"><div class="en">Mobile forensics</div><div class="ar">التحقيق الجنائي للأجهزة المحمولة (Mobile forensics)</div></div></div><div class="opt"><span class="letter">C</span><div class="otext"><div class="en">Database forensics</div><div class="ar">التحقيق الجنائي لقواعد البيانات (Database forensics)</div></div></div><div class="opt"><span class="letter">D</span><div class="otext"><div class="en">Forensics data analysis</div><div class="ar">تحليل البيانات الجنائي (Forensics data analysis)</div></div></div>
+ <details class="ans">
+  <summary><span class="t1">اضغط لإظهار الإجابة الصحيحة</span><span class="t2">إخفاء الإجابة</span></summary>
+  <div class="reveal">
+   <span class="lbl">الإجابة الصحيحة</span>
+   <div class="correct"><div class="en">A. Network forensics</div><div class="ar">الخيار A: التحقيق الجنائي للشبكات (Network forensics)</div></div>
+   <span class="lbl">الشرح من الشابتر</span>
+   <p class="exp ar">Network forensics تهتم بمراقبة وتحليل تدفق الحركة في شبكات الحاسوب لاستخراج أدلة الإدانة (مثل اكتشاف مصدر الهجمات الأمنية) أو لكشف الاختراقات، وتتعامل مع البيانات المتطايرة (الحيّة) فقط بخلاف أنواع التحقيق الأخرى.</p>
+   <div class="rabt"><span class="lbl">ربط للفهم والحفظ</span><div class="ar">Network = شبكة = «حركة المرور» (Traffic) كشبكة الطرق والسيارات. وتذكّر: بياناتها حيّة متطايرة فقط.</div></div>
+   <div class="src ar">المصدر: المحاضرة 1 — شريحة 25</div>
+  </div>
+ </details>
+</section>
+
+<section class="q" id="q13">
+ <div class="qhead"><span class="num">السؤال 13</span><a class="top" href="#top">↑ للأعلى</a></div>
+ <div class="qtext"><div class="en">Which digital forensics category focuses on extracting and analyzing evidence from mobile devices?</div><div class="ar">أي فئة من فئات الأدلة الجنائية الرقمية تركّز على استخراج وتحليل الأدلة من الأجهزة المحمولة؟</div></div>
+ <div class="opt"><span class="letter">A</span><div class="otext"><div class="en">Mobile forensics</div><div class="ar">التحقيق الجنائي للأجهزة المحمولة (Mobile forensics)</div></div></div><div class="opt"><span class="letter">B</span><div class="otext"><div class="en">Network forensics</div><div class="ar">التحقيق الجنائي للشبكات (Network forensics)</div></div></div><div class="opt"><span class="letter">C</span><div class="otext"><div class="en">Database forensics</div><div class="ar">التحقيق الجنائي لقواعد البيانات (Database forensics)</div></div></div><div class="opt"><span class="letter">D</span><div class="otext"><div class="en">Cloud forensics</div><div class="ar">التحقيق الجنائي للحوسبة السحابية (Cloud forensics)</div></div></div>
+ <details class="ans">
+  <summary><span class="t1">اضغط لإظهار الإجابة الصحيحة</span><span class="t2">إخفاء الإجابة</span></summary>
+  <div class="reveal">
+   <span class="lbl">الإجابة الصحيحة</span>
+   <div class="correct"><div class="en">A. Mobile forensics</div><div class="ar">الخيار A: التحقيق الجنائي للأجهزة المحمولة (Mobile forensics)</div></div>
+   <span class="lbl">الشرح من الشابتر</span>
+   <p class="exp ar">Mobile forensics هو نوع من التحقيق الرقمي يهتم بالحصول على أدلة رقمية من الأجهزة المحمولة، أي أي جهاز قادر على إجراء مكالمات عبر شبكات الاتصال القياسية مثل GSM و3G و4G: هواتف، هواتف ذكية، أجهزة لوحية، وأجهزة قابلة للارتداء كالساعات الذكية. (وفئات المحاضرة الخمس هي: Computer وMobile وNetwork وDatabase وForensics Data Analysis.)</p>
+   <div class="rabt"><span class="lbl">ربط للفهم والحفظ</span><div class="ar">Mobile = الجوال بكل بساطة: الأدلة من الهاتف والتابلت والساعة الذكية.</div></div>
+   <div class="src ar">المصدر: المحاضرة 1 — شريحة 24</div>
+  </div>
+ </details>
+</section>
+
+<section class="q" id="q14">
+ <div class="qhead"><span class="num">السؤال 14</span><a class="top" href="#top">↑ للأعلى</a></div>
+ <div class="qtext"><div class="en">Forensics readiness is the ability of an organization to:</div><div class="ar">الجاهزية الجنائية (Forensics readiness) هي قدرة المؤسسة على:</div></div>
+ <div class="opt"><span class="letter">A</span><div class="otext"><div class="en">Collect, preserve, protect, and analyze digital evidence in a forensically sound manner</div><div class="ar">جمع الأدلة الرقمية وحفظها وحمايتها وتحليلها بطريقة سليمة جنائياً</div></div></div><div class="opt"><span class="letter">B</span><div class="otext"><div class="en">Prevent every possible cyberattack</div><div class="ar">منع كل هجوم إلكتروني ممكن</div></div></div><div class="opt"><span class="letter">C</span><div class="otext"><div class="en">Avoid documenting digital evidence</div><div class="ar">تجنّب توثيق الأدلة الرقمية</div></div></div><div class="opt"><span class="letter">D</span><div class="otext"><div class="en">Replace legal procedures with internal policies</div><div class="ar">استبدال الإجراءات القانونية بسياسات داخلية</div></div></div>
+ <details class="ans">
+  <summary><span class="t1">اضغط لإظهار الإجابة الصحيحة</span><span class="t2">إخفاء الإجابة</span></summary>
+  <div class="reveal">
+   <span class="lbl">الإجابة الصحيحة</span>
+   <div class="correct"><div class="en">A. Collect, preserve, protect, and analyze digital evidence in a forensically sound manner</div><div class="ar">الخيار A: جمع الأدلة الرقمية وحفظها وحمايتها وتحليلها بطريقة سليمة جنائياً</div></div>
+   <span class="lbl">الشرح من الشابتر</span>
+   <p class="exp ar">الجاهزية الجنائية هي قدرة مؤسسة معينة على جمع الأدلة الرقمية وحفظها وحمايتها وتحليلها بطريقة سليمة جنائياً، ودون تعطيل العمليات الجارية لتقليل تكلفة التحقيق. من فوائدها: استجابة عالية للحوادث، الامتثال للوائح الحكومية، تعزيز دفاع المؤسسة، وتقليل الهجمات الداخلية.</p>
+   <div class="rabt"><span class="lbl">ربط للفهم والحفظ</span><div class="ar">Readiness = «جاهز قبل الحادثة». أربعة أفعال: جمع، حفظ، حماية، تحليل. وليست «منع كل هجوم» لأن ذلك مستحيل.</div></div>
+   <div class="src ar">المصدر: المحاضرة 1 — الشريحتان 31 و32</div>
+  </div>
+ </details>
+</section>
+
+<section class="q" id="q15">
+ <div class="qhead"><span class="num">السؤال 15</span><a class="top" href="#top">↑ للأعلى</a></div>
+ <div class="qtext"><div class="en">In digital forensics, &quot;slack space&quot; refers to:</div><div class="ar">في الأدلة الجنائية الرقمية، يشير مصطلح «slack space» إلى:</div></div>
+ <div class="opt"><span class="letter">A</span><div class="otext"><div class="en">Unused space between the end of a file and the end of the allocated cluster</div><div class="ar">المساحة غير المستخدمة بين نهاية الملف ونهاية العنقود (Cluster) المخصّص له</div></div></div><div class="opt"><span class="letter">B</span><div class="otext"><div class="en">The physical distance between the hard drive and CPU</div><div class="ar">المسافة المادية بين القرص الصلب والمعالج</div></div></div><div class="opt"><span class="letter">C</span><div class="otext"><div class="en">Time delay during network transmission</div><div class="ar">التأخير الزمني أثناء نقل البيانات عبر الشبكة</div></div></div><div class="opt"><span class="letter">D</span><div class="otext"><div class="en">Free space on a network server drive</div><div class="ar">المساحة الحرة على قرص خادم شبكي</div></div></div>
+ <details class="ans">
+  <summary><span class="t1">اضغط لإظهار الإجابة الصحيحة</span><span class="t2">إخفاء الإجابة</span></summary>
+  <div class="reveal">
+   <span class="lbl">الإجابة الصحيحة</span>
+   <div class="correct"><div class="en">A. Unused space between the end of a file and the end of the allocated cluster</div><div class="ar">الخيار A: المساحة غير المستخدمة بين نهاية الملف ونهاية العنقود (Cluster) المخصّص له</div></div>
+   <span class="lbl">الشرح من الشابتر</span>
+   <p class="exp ar">تذكر المحاضرة «Hidden partition and slack space» ضمن البيانات التي تنشئها الأجهزة تلقائياً وقد تحتوي معلومات مخفية للمستخدم. وتعريفه: عندما يُخزَّن ملف في عنقود أكبر من حجمه تبقى مساحة غير مستخدمة بين نهاية الملف ونهاية العنقود، وقد تحتفظ ببقايا بيانات. (ملاحظة: الشرائح تذكر المصطلح فقط، والتعريف هو المعنى المعتمد لهذا المصطلح.)</p>
+   <div class="rabt"><span class="lbl">ربط للفهم والحفظ</span><div class="ar">Slack = «فراغ زائد»: كعلبة أكبر من الهدية؛ الفراغ داخل العلبة هو الـ Slack وقد يختبئ فيه شيء.</div></div>
+   <div class="src ar">المصدر: المحاضرة 1 — شريحة 39 (ذكر المصطلح)</div>
+  </div>
+ </details>
+</section><h2 class="sec" id="sec2">المحاضرة 2 — Legal Compliance (المختبرات وسلسلة الحيازة وعملية الفحص)</h2>
+
+<section class="q" id="q16">
+ <div class="qhead"><span class="num">السؤال 16</span><a class="top" href="#top">↑ للأعلى</a></div>
+ <div class="qtext"><div class="en">Why may an organization establish an in-house digital forensics lab?</div><div class="ar">لماذا قد تنشئ مؤسسة مختبراً داخلياً للأدلة الجنائية الرقمية؟</div></div>
+ <div class="opt"><span class="letter">A</span><div class="otext"><div class="en">To speed the investigation process and reduce investigation costs</div><div class="ar">لتسريع عملية التحقيق وتقليل تكاليف التحقيق</div></div></div><div class="opt"><span class="letter">B</span><div class="otext"><div class="en">To eliminate the need to protect digital evidence</div><div class="ar">للتخلص من الحاجة إلى حماية الأدلة الرقمية</div></div></div><div class="opt"><span class="letter">C</span><div class="otext"><div class="en">To allow unrestricted Internet access to evidence systems</div><div class="ar">للسماح بوصول غير مقيّد إلى الإنترنت من أنظمة الأدلة</div></div></div><div class="opt"><span class="letter">D</span><div class="otext"><div class="en">To avoid working with law enforcement in all cases</div><div class="ar">لتجنّب العمل مع جهات إنفاذ القانون في جميع الحالات</div></div></div>
+ <details class="ans">
+  <summary><span class="t1">اضغط لإظهار الإجابة الصحيحة</span><span class="t2">إخفاء الإجابة</span></summary>
+  <div class="reveal">
+   <span class="lbl">الإجابة الصحيحة</span>
+   <div class="correct"><div class="en">A. To speed the investigation process and reduce investigation costs</div><div class="ar">الخيار A: لتسريع عملية التحقيق وتقليل تكاليف التحقيق</div></div>
+   <span class="lbl">الشرح من الشابتر</span>
+   <p class="exp ar">مختبرات الشرطة مزدحمة بقوائم انتظار طويلة قد تستمر شهوراً أو سنوات، لذلك تنشئ الشركات مختبراتها الداخلية لتسريع التحقيق وتقليل التكاليف، ولأن الشركات الخاصة أكثر مرونة. ويعمل المحللون الداخليون بالتعاون مع جهات إنفاذ القانون لا بدونها، ويجب حماية الأدلة وعزل شبكة المختبر.</p>
+   <div class="rabt"><span class="lbl">ربط للفهم والحفظ</span><div class="ar">In-house = «في بيتنا»: أسرع وأرخص بدل الانتظار في طابور مختبر الشرطة. (سرعة + توفير).</div></div>
+   <div class="src ar">المصدر: المحاضرة 2 — الشريحتان 6 و7</div>
+  </div>
+ </details>
+</section>
+
+<section class="q" id="q17">
+ <div class="qhead"><span class="num">السؤال 17</span><a class="top" href="#top">↑ للأعلى</a></div>
+ <div class="qtext"><div class="en">Which physical requirement is specified for a digital forensics lab?</div><div class="ar">أي متطلب مادي محدد للمختبر الجنائي الرقمي؟</div></div>
+ <div class="opt"><span class="letter">A</span><div class="otext"><div class="en">The lab should have no windows</div><div class="ar">يجب ألا يحتوي المختبر على نوافذ</div></div></div><div class="opt"><span class="letter">B</span><div class="otext"><div class="en">The lab should have several public entrances</div><div class="ar">يجب أن يحتوي المختبر على عدة مداخل عامة</div></div></div><div class="opt"><span class="letter">C</span><div class="otext"><div class="en">The evidence room should remain unlocked</div><div class="ar">يجب أن تبقى غرفة الأدلة غير مقفلة</div></div></div><div class="opt"><span class="letter">D</span><div class="otext"><div class="en">The lab should not use surveillance cameras</div><div class="ar">يجب ألا يستخدم المختبر كاميرات مراقبة</div></div></div>
+ <details class="ans">
+  <summary><span class="t1">اضغط لإظهار الإجابة الصحيحة</span><span class="t2">إخفاء الإجابة</span></summary>
+  <div class="reveal">
+   <span class="lbl">الإجابة الصحيحة</span>
+   <div class="correct"><div class="en">A. The lab should have no windows</div><div class="ar">الخيار A: يجب ألا يحتوي المختبر على نوافذ</div></div>
+   <span class="lbl">الشرح من الشابتر</span>
+   <p class="exp ar">متطلبات المختبر: باب دخول واحد فقط، لا نوافذ، عازل للصوت، نظام إنذار عند المدخل، نظام بصمة حيوية يسجّل كل زيارة، كاميرات مراقبة تغطي كامل المختبر خاصة المدخل وغرفة الأدلة، وأنظمة إطفاء حريق. لذلك B وC وD عكس المطلوب تماماً.</p>
+   <div class="rabt"><span class="lbl">ربط للفهم والحفظ</span><div class="ar">«باب واحد، صفر نوافذ»: كالخزنة، مدخل واحد وبلا نوافذ وكاميرات في كل مكان.</div></div>
+   <div class="src ar">المصدر: المحاضرة 2 — شريحة 11</div>
+  </div>
+ </details>
+</section>
+
+<section class="q" id="q18">
+ <div class="qhead"><span class="num">السؤال 18</span><a class="top" href="#top">↑ للأعلى</a></div>
+ <div class="qtext"><div class="en">What is the purpose of a Faraday bag in digital forensics?</div><div class="ar">ما الغرض من كيس فاراداي (Faraday bag) في الأدلة الجنائية الرقمية؟</div></div>
+ <div class="opt"><span class="letter">A</span><div class="otext"><div class="en">To prevent a network signal from reaching a phone</div><div class="ar">منع إشارة الشبكة من الوصول إلى الهاتف</div></div></div><div class="opt"><span class="letter">B</span><div class="otext"><div class="en">To increase a phone&#x27;s network signal</div><div class="ar">زيادة قوة إشارة شبكة الهاتف</div></div></div><div class="opt"><span class="letter">C</span><div class="otext"><div class="en">To create a bit-to-bit image</div><div class="ar">إنشاء نسخة طبق الأصل بت ببت (bit-to-bit image)</div></div></div><div class="opt"><span class="letter">D</span><div class="otext"><div class="en">To recover deleted e-mails</div><div class="ar">استعادة رسائل البريد الإلكتروني المحذوفة</div></div></div>
+ <details class="ans">
+  <summary><span class="t1">اضغط لإظهار الإجابة الصحيحة</span><span class="t2">إخفاء الإجابة</span></summary>
+  <div class="reveal">
+   <span class="lbl">الإجابة الصحيحة</span>
+   <div class="correct"><div class="en">A. To prevent a network signal from reaching a phone</div><div class="ar">الخيار A: منع إشارة الشبكة من الوصول إلى الهاتف</div></div>
+   <span class="lbl">الشرح من الشابتر</span>
+   <p class="exp ar">كيس فاراداي وسيلة لمنع إشارة الشبكة من الوصول إلى الهاتف. وهو نفس فكرة مواد حجب الترددات اللاسلكية في حقيبة المستجيب الأول (المحاضرة 3)، حتى لا يستقبل الجهاز المحجوز مكالمات أو رسائل قد تغيّر بياناته.</p>
+   <div class="rabt"><span class="lbl">ربط للفهم والحفظ</span><div class="ar">Faraday = «قفص يعزل الإشارة»: الجوال داخله كأنه في مصعد بلا شبكة.</div></div>
+   <div class="src ar">المصدر: المحاضرة 2 — شريحة 17</div>
+  </div>
+ </details>
+</section>
+
+<section class="q" id="q19">
+ <div class="qhead"><span class="num">السؤال 19</span><a class="top" href="#top">↑ للأعلى</a></div>
+ <div class="qtext"><div class="en">To maintain a correct chain of custody, investigators should maintain:</div><div class="ar">للحفاظ على سلسلة حيازة (Chain of custody) صحيحة، ينبغي على المحققين الاحتفاظ بـ:</div></div>
+ <div class="opt"><span class="letter">A</span><div class="otext"><div class="en">An audit log tracking the movements and possessors of digital evidence</div><div class="ar">سجل تدقيق (Audit log) يتتبع حركة الأدلة الرقمية وحائزيها</div></div></div><div class="opt"><span class="letter">B</span><div class="otext"><div class="en">Only a list of software licenses</div><div class="ar">فقط قائمة بتراخيص البرامج</div></div></div><div class="opt"><span class="letter">C</span><div class="otext"><div class="en">Only the suspect&#x27;s name</div><div class="ar">فقط اسم المشتبه به</div></div></div><div class="opt"><span class="letter">D</span><div class="otext"><div class="en">A list of unrelated network devices</div><div class="ar">قائمة بأجهزة شبكة غير ذات صلة</div></div></div>
+ <details class="ans">
+  <summary><span class="t1">اضغط لإظهار الإجابة الصحيحة</span><span class="t2">إخفاء الإجابة</span></summary>
+  <div class="reveal">
+   <span class="lbl">الإجابة الصحيحة</span>
+   <div class="correct"><div class="en">A. An audit log tracking the movements and possessors of digital evidence</div><div class="ar">الخيار A: سجل تدقيق (Audit log) يتتبع حركة الأدلة الرقمية وحائزيها</div></div>
+   <span class="lbl">الشرح من الشابتر</span>
+   <p class="exp ar">لتكون سلسلة الحيازة مقبولة في المحكمة يجب الاحتفاظ بسجل تدقيق لكل الأدلة الرقمية المحصَّلة، يتتبع حركتها وحائزيها في جميع الأوقات. وإذا لم نعرف من لامس الدليل في أي مرحلة من التحقيق صارت السلسلة والدليل بلا قيمة في المحكمة.</p>
+   <div class="rabt"><span class="lbl">ربط للفهم والحفظ</span><div class="ar">Audit log = «دفتر الاستلام والتسليم» كسجل الطرود: من استلم؟ ومتى؟ وأين ذهب؟</div></div>
+   <div class="src ar">المصدر: المحاضرة 2 — شريحة 22</div>
+  </div>
+ </details>
+</section>
+
+<section class="q" id="q20">
+ <div class="qhead"><span class="num">السؤال 20</span><a class="top" href="#top">↑ للأعلى</a></div>
+ <div class="qtext"><div class="en">The main goal of maintaining a proper chain of custody is to:</div><div class="ar">الهدف الرئيسي من الحفاظ على سلسلة حيازة سليمة هو:</div></div>
+ <div class="opt"><span class="letter">A</span><div class="otext"><div class="en">Ensure the integrity of digital evidence by knowing who handled it</div><div class="ar">ضمان سلامة الأدلة الرقمية بمعرفة من تعامل معها</div></div></div><div class="opt"><span class="letter">B</span><div class="otext"><div class="en">Make digital evidence publicly available</div><div class="ar">جعل الأدلة الرقمية متاحة للعامة</div></div></div><div class="opt"><span class="letter">C</span><div class="otext"><div class="en">Allow evidence to be modified during analysis</div><div class="ar">السماح بتعديل الأدلة أثناء التحليل</div></div></div><div class="opt"><span class="letter">D</span><div class="otext"><div class="en">Reduce the need for documentation</div><div class="ar">تقليل الحاجة إلى التوثيق</div></div></div>
+ <details class="ans">
+  <summary><span class="t1">اضغط لإظهار الإجابة الصحيحة</span><span class="t2">إخفاء الإجابة</span></summary>
+  <div class="reveal">
+   <span class="lbl">الإجابة الصحيحة</span>
+   <div class="correct"><div class="en">A. Ensure the integrity of digital evidence by knowing who handled it</div><div class="ar">الخيار A: ضمان سلامة الأدلة الرقمية بمعرفة من تعامل معها</div></div>
+   <span class="lbl">الشرح من الشابتر</span>
+   <p class="exp ar">الهدف النهائي هو ضمان سلامة (Integrity) الدليل الرقمي عبر معرفة جميع الأشخاص الذين لامسوه من لحظة الحصول عليه حتى عرضه في المحكمة. وسلسلة الحيازة كلها توثيق: كل حركة للدليل تُوثَّق ليثبت المحقق أنه لم يُعدَّل وأنه لم تُزرع أدلة خارجية لتضليل التحقيق.</p>
+   <div class="rabt"><span class="lbl">ربط للفهم والحفظ</span><div class="ar">Chain = سلسلة: كل حلقة = شخص. لو انكسرت حلقة (شخص مجهول) سقط الدليل. الهدف = السلامة.</div></div>
+   <div class="src ar">المصدر: المحاضرة 2 — الشريحتان 21 و25</div>
+  </div>
+ </details>
+</section>
+
+<section class="q" id="q21">
+ <div class="qhead"><span class="num">السؤال 21</span><a class="top" href="#top">↑ للأعلى</a></div>
+ <div class="qtext"><div class="en">Which sequence represents the four main phases of the digital forensics examination process?</div><div class="ar">أي تسلسل يمثل المراحل الأربع الرئيسية لعملية فحص الأدلة الجنائية الرقمية؟</div></div>
+ <div class="opt"><span class="letter">A</span><div class="otext"><div class="en">Seizure, Acquisition, Analysis, Reporting</div><div class="ar">الضبط (Seizure)، الاستحواذ (Acquisition)، التحليل (Analysis)، إعداد التقرير (Reporting)</div></div></div><div class="opt"><span class="letter">B</span><div class="otext"><div class="en">Reporting, Seizure, Deletion, Acquisition</div><div class="ar">إعداد التقرير، الضبط، الحذف، الاستحواذ</div></div></div><div class="opt"><span class="letter">C</span><div class="otext"><div class="en">Acquisition, Reporting, Encryption, Seizure</div><div class="ar">الاستحواذ، إعداد التقرير، التشفير، الضبط</div></div></div><div class="opt"><span class="letter">D</span><div class="otext"><div class="en">Analysis, Installation, Seizure, Formatting</div><div class="ar">التحليل، التثبيت، الضبط، التهيئة</div></div></div>
+ <details class="ans">
+  <summary><span class="t1">اضغط لإظهار الإجابة الصحيحة</span><span class="t2">إخفاء الإجابة</span></summary>
+  <div class="reveal">
+   <span class="lbl">الإجابة الصحيحة</span>
+   <div class="correct"><div class="en">A. Seizure, Acquisition, Analysis, Reporting</div><div class="ar">الخيار A: الضبط (Seizure)، الاستحواذ (Acquisition)، التحليل (Analysis)، إعداد التقرير (Reporting)</div></div>
+   <span class="lbl">الشرح من الشابتر</span>
+   <p class="exp ar">تقسّم معظم المناهج العمل إلى أربع مراحل: 1) الضبط (Seizure): حجز الجهاز ونقله بأمان إلى المختبر بإذن من جهة مختصة، 2) الاستحواذ (Acquisition): نسخة بت ببت وأخذ الـ RAM إن كان الجهاز يعمل، 3) التحليل (Analysis)، 4) إعداد التقرير (Reporting). الخيارات الأخرى فيها حذف أو تهيئة أو تثبيت وهي تتلف الأدلة.</p>
+   <div class="rabt"><span class="lbl">ربط للفهم والحفظ</span><div class="ar">اضبط ← انسخ ← حلّل ← اكتب: Seize → Acquire → Analyze → Report (S-A-A-R).</div></div>
+   <div class="src ar">المصدر: المحاضرة 2 — الشرائح 30–35</div>
+  </div>
+ </details>
+</section>
+
+<section class="q" id="q22">
+ <div class="qhead"><span class="num">السؤال 22</span><a class="top" href="#top">↑ للأعلى</a></div>
+ <div class="qtext"><div class="en">When duplicating a suspect hard drive, the original drive should be:</div><div class="ar">عند نسخ القرص الصلب للمشتبه به، يجب أن يكون القرص الأصلي:</div></div>
+ <div class="opt"><span class="letter">A</span><div class="otext"><div class="en">Write-protected to avoid tampering with the original evidence</div><div class="ar">محمياً ضد الكتابة (Write-protected) لتجنب العبث بالدليل الأصلي</div></div></div><div class="opt"><span class="letter">B</span><div class="otext"><div class="en">Connected to the Internet</div><div class="ar">متصلاً بالإنترنت</div></div></div><div class="opt"><span class="letter">C</span><div class="otext"><div class="en">Formatted before acquisition</div><div class="ar">مُهيّأً (Formatted) قبل الاستحواذ</div></div></div><div class="opt"><span class="letter">D</span><div class="otext"><div class="en">Modified to remove deleted files</div><div class="ar">مُعدَّلاً لإزالة الملفات المحذوفة</div></div></div>
+ <details class="ans">
+  <summary><span class="t1">اضغط لإظهار الإجابة الصحيحة</span><span class="t2">إخفاء الإجابة</span></summary>
+  <div class="reveal">
+   <span class="lbl">الإجابة الصحيحة</span>
+   <div class="correct"><div class="en">A. Write-protected to avoid tampering with the original evidence</div><div class="ar">الخيار A: محمياً ضد الكتابة (Write-protected) لتجنب العبث بالدليل الأصلي</div></div>
+   <span class="lbl">الشرح من الشابتر</span>
+   <p class="exp ar">يقوم الفاحص بنسخ القرص المشتبه به (bit-to-bit image) ثم يجري التحليل على النسخة لاحقاً. ويجب أن يكون القرص الأصلي محمياً من الكتابة أثناء النسخ لتجنب العبث بالدليل الأصلي. أما التهيئة أو التعديل أو الاتصال بالإنترنت فكلها تغيّر الدليل أو تعرّضه للخطر.</p>
+   <div class="rabt"><span class="lbl">ربط للفهم والحفظ</span><div class="ar">الأصل «مقدّس: للقراءة فقط». نحلّل النسخة ونترك الأصل كما هو.</div></div>
+   <div class="src ar">المصدر: المحاضرة 2 — شريحة 32</div>
+  </div>
+ </details>
+</section>
+
+<section class="q" id="q23">
+ <div class="qhead"><span class="num">السؤال 23</span><a class="top" href="#top">↑ للأعلى</a></div>
+ <div class="qtext"><div class="en">What is the main purpose of a write blocker device during drive acquisition?</div><div class="ar">ما الغرض الرئيسي من جهاز حاجب الكتابة (Write blocker) أثناء استحواذ القرص؟</div></div>
+ <div class="opt"><span class="letter">A</span><div class="otext"><div class="en">To prevent any modifications or writes to the original drive</div><div class="ar">منع أي تعديلات أو عمليات كتابة على القرص الأصلي</div></div></div><div class="opt"><span class="letter">B</span><div class="otext"><div class="en">To block unauthorized wireless connections</div><div class="ar">حجب الاتصالات اللاسلكية غير المصرّح بها</div></div></div><div class="opt"><span class="letter">C</span><div class="otext"><div class="en">To bypass operating system passwords</div><div class="ar">تجاوز كلمات مرور نظام التشغيل</div></div></div><div class="opt"><span class="letter">D</span><div class="otext"><div class="en">To delete malicious code automatically</div><div class="ar">حذف الشيفرات الخبيثة تلقائياً</div></div></div>
+ <details class="ans">
+  <summary><span class="t1">اضغط لإظهار الإجابة الصحيحة</span><span class="t2">إخفاء الإجابة</span></summary>
+  <div class="reveal">
+   <span class="lbl">الإجابة الصحيحة</span>
+   <div class="correct"><div class="en">A. To prevent any modifications or writes to the original drive</div><div class="ar">الخيار A: منع أي تعديلات أو عمليات كتابة على القرص الأصلي</div></div>
+   <span class="lbl">الشرح من الشابتر</span>
+   <p class="exp ar">تنص المحاضرة على أن القرص المشتبه به يجب أن يكون محمياً من الكتابة (Write-protected) عند عملية النسخ لتجنب العبث بالدليل الأصلي، وهذا هو دور حاجب الكتابة. (ملاحظة: الشرائح تذكر مبدأ الحماية من الكتابة ولا تذكر مصطلح «Write blocker» حرفياً، لكن المعنى مطابق.)</p>
+   <div class="rabt"><span class="lbl">ربط للفهم والحفظ</span><div class="ar">Write Blocker = «يمنع الكتابة». اسمه يشرح وظيفته: لا شيء يُكتب على الأصل.</div></div>
+   <div class="src ar">المصدر: المحاضرة 2 — شريحة 32 (مبدأ الحماية من الكتابة)</div>
+  </div>
+ </details>
+</section>
+
+<section class="q" id="q24">
+ <div class="qhead"><span class="num">السؤال 24</span><a class="top" href="#top">↑ للأعلى</a></div>
+ <div class="qtext"><div class="en">A forensic report is usually prepared for nontechnical people such as:</div><div class="ar">يُعدّ التقرير الجنائي عادةً لأشخاص غير تقنيين مثل:</div></div>
+ <div class="opt"><span class="letter">A</span><div class="otext"><div class="en">Attorneys, judges, and juries</div><div class="ar">المحامين والقضاة وهيئات المحلفين</div></div></div><div class="opt"><span class="letter">B</span><div class="otext"><div class="en">Only software developers</div><div class="ar">فقط مطوّري البرمجيات</div></div></div><div class="opt"><span class="letter">C</span><div class="otext"><div class="en">Only network administrators</div><div class="ar">فقط مديري الشبكات</div></div></div><div class="opt"><span class="letter">D</span><div class="otext"><div class="en">Only database programmers</div><div class="ar">فقط مبرمجي قواعد البيانات</div></div></div>
+ <details class="ans">
+  <summary><span class="t1">اضغط لإظهار الإجابة الصحيحة</span><span class="t2">إخفاء الإجابة</span></summary>
+  <div class="reveal">
+   <span class="lbl">الإجابة الصحيحة</span>
+   <div class="correct"><div class="en">A. Attorneys, judges, and juries</div><div class="ar">الخيار A: المحامين والقضاة وهيئات المحلفين</div></div>
+   <span class="lbl">الشرح من الشابتر</span>
+   <p class="exp ar">ينتج الفاحص تقريراً منظماً بالنتائج يُعدّ عادةً لغير التقنيين (محامين، قضاة، محلفين)، وتُقدَّم الأدلة معه غالباً بصيغة رقمية. ولهذا يجب أن يتضمن التقرير شرحاً للمصطلحات التقنية ليفهمها غير المتخصصين.</p>
+   <div class="rabt"><span class="lbl">ربط للفهم والحفظ</span><div class="ar">التقرير يُقرأ في «قاعة المحكمة» فالقارئ محامٍ أو قاضٍ أو محلّف، وليس مبرمجاً.</div></div>
+   <div class="src ar">المصدر: المحاضرة 2 — الشريحتان 35 و37</div>
+  </div>
+ </details>
+</section>
+
+<section class="q" id="q25">
+ <div class="qhead"><span class="num">السؤال 25</span><a class="top" href="#top">↑ للأعلى</a></div>
+ <div class="qtext"><div class="en">Why is documentation critical at every stage of a digital forensics investigation?</div><div class="ar">لماذا يُعدّ التوثيق ضرورياً في كل مرحلة من مراحل التحقيق الجنائي الرقمي؟</div></div>
+ <div class="opt"><span class="letter">A</span><div class="otext"><div class="en">To ensure repeatability, transparency, and admissibility in a court of law</div><div class="ar">لضمان قابلية التكرار والشفافية وقبول الأدلة أمام المحكمة</div></div></div><div class="opt"><span class="letter">B</span><div class="otext"><div class="en">To increase the total file size of the report</div><div class="ar">لزيادة الحجم الكلي لملف التقرير</div></div></div><div class="opt"><span class="letter">C</span><div class="otext"><div class="en">To satisfy basic accounting requirements</div><div class="ar">لتلبية متطلبات المحاسبة الأساسية</div></div></div><div class="opt"><span class="letter">D</span><div class="otext"><div class="en">To replace the need for physical evidence storage</div><div class="ar">لإلغاء الحاجة إلى تخزين الأدلة المادية</div></div></div>
+ <details class="ans">
+  <summary><span class="t1">اضغط لإظهار الإجابة الصحيحة</span><span class="t2">إخفاء الإجابة</span></summary>
+  <div class="reveal">
+   <span class="lbl">الإجابة الصحيحة</span>
+   <div class="correct"><div class="en">A. To ensure repeatability, transparency, and admissibility in a court of law</div><div class="ar">الخيار A: لضمان قابلية التكرار والشفافية وقبول الأدلة أمام المحكمة</div></div>
+   <span class="lbl">الشرح من الشابتر</span>
+   <p class="exp ar">المحاضرات تؤكد أن سلسلة الحيازة كلها توثيق لإثبات أن الدليل لم يُعدَّل ولم تُزرع أدلة خارجية (المحاضرة 2)، وأن أداة استخراج الـ RAM يجب أن تُوثَّق في التقرير لأنها تُحدث تغييرات بسيطة، وأن توثيق مسرح الجريمة بالصور والملاحظات يساعد على إعداد التقرير النهائي وتذكّر المشهد عند الشهادة في المحكمة (المحاضرة 3). (ملاحظة: كلمتا «التكرار والشفافية» ليستا حرفياً في الشرائح لكن المعنى مطابق.)</p>
+   <div class="rabt"><span class="lbl">ربط للفهم والحفظ</span><div class="ar">«ما لم يُوثَّق فكأنه لم يحدث» أمام القاضي.</div></div>
+   <div class="src ar">المصدر: المحاضرة 2 — الشريحتان 25 و33، المحاضرة 3 — شريحة 25</div>
+  </div>
+ </details>
+</section><h2 class="sec" id="sec3">المحاضرة 3 — Investigatory Process (عملية التحقيق والمستجيب الأول)</h2>
+
+<section class="q" id="q26">
+ <div class="qhead"><span class="num">السؤال 26</span><a class="top" href="#top">↑ للأعلى</a></div>
+ <div class="qtext"><div class="en">What is the primary role of an Incident Response team?</div><div class="ar">ما الدور الأساسي لفريق الاستجابة للحوادث (Incident Response team)؟</div></div>
+ <div class="opt"><span class="letter">A</span><div class="otext"><div class="en">To address and manage the aftermath of a security breach or cyberattack</div><div class="ar">معالجة وإدارة تبعات الاختراق الأمني أو الهجوم الإلكتروني</div></div></div><div class="opt"><span class="letter">B</span><div class="otext"><div class="en">To sell cybersecurity software licenses</div><div class="ar">بيع تراخيص برمجيات الأمن السيبراني</div></div></div><div class="opt"><span class="letter">C</span><div class="otext"><div class="en">To manufacture hardware components</div><div class="ar">تصنيع مكوّنات العتاد</div></div></div><div class="opt"><span class="letter">D</span><div class="otext"><div class="en">To audit financial accounts annually</div><div class="ar">تدقيق الحسابات المالية سنوياً</div></div></div>
+ <details class="ans">
+  <summary><span class="t1">اضغط لإظهار الإجابة الصحيحة</span><span class="t2">إخفاء الإجابة</span></summary>
+  <div class="reveal">
+   <span class="lbl">الإجابة الصحيحة</span>
+   <div class="correct"><div class="en">A. To address and manage the aftermath of a security breach or cyberattack</div><div class="ar">الخيار A: معالجة وإدارة تبعات الاختراق الأمني أو الهجوم الإلكتروني</div></div>
+   <span class="lbl">الشرح من الشابتر</span>
+   <p class="exp ar">هذا السؤال لا يرد نصاً في شرائح المحاضرات الخمس (معلومة عامة)، والإجابة A هي الصحيحة عاماً: فريق الاستجابة للحوادث مهمته التعامل مع الاختراق أو الهجوم وإدارة آثاره. وأقرب ما في المحاضرات: عند الإبلاغ عن حادثة تُرسل الجهة المسؤولة «المستجيب الأول» ليجري التحقيق الأولي لتحديد السبب الجذري. أما B وC وD فلا علاقة لها بالأمن.</p>
+   <div class="rabt"><span class="lbl">ربط للفهم والحفظ</span><div class="ar">Incident Response = «الإسعاف السيبراني»: وقع الحادث فيتدخل لاحتواء الضرر وإدارة ما بعده.</div></div>
+   <div class="src ar">المصدر: غير مذكور نصاً في المحاضرات (معلومة عامة) — أقرب مرجع: المحاضرة 3 شريحة 3</div>
+  </div>
+ </details>
+</section>
+
+<section class="q" id="q27">
+ <div class="qhead"><span class="num">السؤال 27</span><a class="top" href="#top">↑ للأعلى</a></div>
+ <div class="qtext"><div class="en">What is the initial role of a first responder in a digital incident?</div><div class="ar">ما الدور الأولي للمستجيب الأول (First responder) في حادثة رقمية؟</div></div>
+ <div class="opt"><span class="letter">A</span><div class="otext"><div class="en">Conduct the initial investigation to determine the incident&#x27;s root cause</div><div class="ar">إجراء التحقيق الأولي لتحديد السبب الجذري للحادثة</div></div></div><div class="opt"><span class="letter">B</span><div class="otext"><div class="en">Issue a final court judgment</div><div class="ar">إصدار حكم نهائي من المحكمة</div></div></div><div class="opt"><span class="letter">C</span><div class="otext"><div class="en">Destroy all duplicate evidence</div><div class="ar">إتلاف جميع الأدلة المكررة</div></div></div><div class="opt"><span class="letter">D</span><div class="otext"><div class="en">Replace the original storage device before documentation</div><div class="ar">استبدال وحدة التخزين الأصلية قبل التوثيق</div></div></div>
+ <details class="ans">
+  <summary><span class="t1">اضغط لإظهار الإجابة الصحيحة</span><span class="t2">إخفاء الإجابة</span></summary>
+  <div class="reveal">
+   <span class="lbl">الإجابة الصحيحة</span>
+   <div class="correct"><div class="en">A. Conduct the initial investigation to determine the incident&#x27;s root cause</div><div class="ar">الخيار A: إجراء التحقيق الأولي لتحديد السبب الجذري للحادثة</div></div>
+   <span class="lbl">الشرح من الشابتر</span>
+   <p class="exp ar">عند الإبلاغ عن حادثة تتضمن أدلة رقمية، ترسل الجهة المسؤولة عن التحقيق (جهة حكومية أو مختبر خاص) شخصاً أو أكثر يُسمّى «المستجيب الأول»، وهو مسؤول عن إجراء التحقيق الأولي لتحديد السبب الجذري (Root cause). ومن الناحية التقنية يجب أن يفهم إجراءات الأدلة الجنائية الرقمية وكيفية الحصول على الدليل بطريقة سليمة جنائياً لاستخدامه في المحكمة.</p>
+   <div class="rabt"><span class="lbl">ربط للفهم والحفظ</span><div class="ar">First responder = «أول من يصل»، وأول ما يفعله: يبحث «من أين بدأت المشكلة؟» (Root cause). إصدار الحكم دور القاضي لا دوره.</div></div>
+   <div class="src ar">المصدر: المحاضرة 3 — الشريحتان 3 و4</div>
+  </div>
+ </details>
+</section>
+
+<section class="q" id="q28">
+ <div class="qhead"><span class="num">السؤال 28</span><a class="top" href="#top">↑ للأعلى</a></div>
+ <div class="qtext"><div class="en">Which type of search warrant concerns evidence held by an ISP or cloud storage provider?</div><div class="ar">أي نوع من أوامر التفتيش يتعلق بالأدلة التي يحتفظ بها مزوّد خدمة الإنترنت (ISP) أو مزوّد التخزين السحابي؟</div></div>
+ <div class="opt"><span class="letter">A</span><div class="otext"><div class="en">Electronic storage device search warrant</div><div class="ar">أمر تفتيش جهاز التخزين الإلكتروني</div></div></div><div class="opt"><span class="letter">B</span><div class="otext"><div class="en">Service provider search warrant</div><div class="ar">أمر تفتيش مزوّد الخدمة</div></div></div><div class="opt"><span class="letter">C</span><div class="otext"><div class="en">Equipment transport authorization</div><div class="ar">تصريح نقل المعدات</div></div></div><div class="opt"><span class="letter">D</span><div class="otext"><div class="en">Laboratory equipment request</div><div class="ar">طلب معدات المختبر</div></div></div>
+ <details class="ans">
+  <summary><span class="t1">اضغط لإظهار الإجابة الصحيحة</span><span class="t2">إخفاء الإجابة</span></summary>
+  <div class="reveal">
+   <span class="lbl">الإجابة الصحيحة</span>
+   <div class="correct"><div class="en">B. Service provider search warrant</div><div class="ar">الخيار B: أمر تفتيش مزوّد الخدمة</div></div>
+   <span class="lbl">الشرح من الشابتر</span>
+   <p class="exp ar">هناك نوعان من أوامر التفتيش: 1) أمر تفتيش جهاز التخزين الإلكتروني: يسمح بضبط أجهزة التخزين (حواسيب، فلاشات، أقراص خارجية، CD/DVD) من مقر المشتبه به. 2) أمر تفتيش مزوّد الخدمة: إذا ارتكب المشتبه به جريمته عبر الإنترنت فيُحقَّق عبر مزوّدين خارجيين مثل ISP ومزوّدي التخزين السحابي والتجار الإلكترونيين. وأوامر التفتيش متاحة لضباط إنفاذ القانون فقط.</p>
+   <div class="rabt"><span class="lbl">ربط للفهم والحفظ</span><div class="ar">Provider = مزوّد: الدليل «عند طرف ثالث» (ISP أو Cloud) وليس في جهاز المشتبه نفسه.</div></div>
+   <div class="src ar">المصدر: المحاضرة 3 — شريحة 11 (وشريحة 9)</div>
+  </div>
+ </details>
+</section>
+
+<section class="q" id="q29">
+ <div class="qhead"><span class="num">السؤال 29</span><a class="top" href="#top">↑ للأعلى</a></div>
+ <div class="qtext"><div class="en">Why should a first responder carry radio frequency-shielding material?</div><div class="ar">لماذا ينبغي أن يحمل المستجيب الأول مواد حجب الترددات اللاسلكية (radio frequency-shielding)؟</div></div>
+ <div class="opt"><span class="letter">A</span><div class="otext"><div class="en">To increase a device&#x27;s wireless signal</div><div class="ar">لزيادة إشارة اللاسلكي للجهاز</div></div></div><div class="opt"><span class="letter">B</span><div class="otext"><div class="en">To repair a damaged storage device</div><div class="ar">لإصلاح جهاز تخزين تالف</div></div></div><div class="opt"><span class="letter">C</span><div class="otext"><div class="en">To prevent seized devices from receiving calls or messages</div><div class="ar">لمنع الأجهزة المحجوزة من استقبال المكالمات أو الرسائل</div></div></div><div class="opt"><span class="letter">D</span><div class="otext"><div class="en">To calculate the hash of an image</div><div class="ar">لحساب قيمة التجزئة (Hash) لصورة</div></div></div>
+ <details class="ans">
+  <summary><span class="t1">اضغط لإظهار الإجابة الصحيحة</span><span class="t2">إخفاء الإجابة</span></summary>
+  <div class="reveal">
+   <span class="lbl">الإجابة الصحيحة</span>
+   <div class="correct"><div class="en">C. To prevent seized devices from receiving calls or messages</div><div class="ar">الخيار C: لمنع الأجهزة المحجوزة من استقبال المكالمات أو الرسائل</div></div>
+   <span class="lbl">الشرح من الشابتر</span>
+   <p class="exp ar">مادة حجب الترددات اللاسلكية تمنع بعض الأجهزة المحجوزة (مثل الهواتف الذكية والأجهزة اللوحية ذات شرائح SIM) من استقبال المكالمات أو الرسائل. وعند ضبط جهاز محمول لديه اتصال لاسلكي يجب وضعه في كيس عازل يحجب الاتصالات اللاسلكية عنه.</p>
+   <div class="rabt"><span class="lbl">ربط للفهم والحفظ</span><div class="ar">RF-shielding = «درع ضد الإشارة»، نفس فكرة كيس فاراداي: الجهاز المحجوز «ينقطع عن العالم» فلا تصله مكالمة ولا رسالة.</div></div>
+   <div class="src ar">المصدر: المحاضرة 3 — الشريحتان 14 و18</div>
+  </div>
+ </details>
+</section>
+
+<section class="q" id="q30">
+ <div class="qhead"><span class="num">السؤال 30</span><a class="top" href="#top">↑ للأعلى</a></div>
+ <div class="qtext"><div class="en">A computer is already powered off when investigators arrive. What action helps preserve its current state?</div><div class="ar">الحاسوب مُطفأ بالفعل عند وصول المحققين. أي إجراء يساعد على الحفاظ على حالته الحالية؟</div></div>
+ <div class="opt"><span class="letter">A</span><div class="otext"><div class="en">Turn it on to check the desktop</div><div class="ar">تشغيله لفحص سطح المكتب</div></div></div><div class="opt"><span class="letter">B</span><div class="otext"><div class="en">Boot it from its internal drive</div><div class="ar">إقلاعه من قرصه الداخلي</div></div></div><div class="opt"><span class="letter">C</span><div class="otext"><div class="en">Restart it repeatedly to test reliability</div><div class="ar">إعادة تشغيله مراراً لاختبار موثوقيته</div></div></div><div class="opt"><span class="letter">D</span><div class="otext"><div class="en">Leave it powered off</div><div class="ar">تركه مُطفأً</div></div></div>
+ <details class="ans">
+  <summary><span class="t1">اضغط لإظهار الإجابة الصحيحة</span><span class="t2">إخفاء الإجابة</span></summary>
+  <div class="reveal">
+   <span class="lbl">الإجابة الصحيحة</span>
+   <div class="correct"><div class="en">D. Leave it powered off</div><div class="ar">الخيار D: تركه مُطفأً</div></div>
+   <span class="lbl">الشرح من الشابتر</span>
+   <p class="exp ar">في مهام المستجيب الأول: إذا كان الحاسوب مطفأً فلا تشغّله. وتؤكد المحاضرة 1 نفس القاعدة: إذا كان الحاسوب يعمل فاتركه يعمل واستحوذ ذاكرته المتطايرة (إن أمكن)، وإذا كان مطفأً فاتركه مطفأً لتجنب تغيير أي بيانات.</p>
+   <div class="rabt"><span class="lbl">ربط للفهم والحفظ</span><div class="ar">«شغّال ← خلّه شغّال (وخذ الـ RAM)، مطفأ ← خلّه مطفأ». لا تلمس زر التشغيل أبداً.</div></div>
+   <div class="src ar">المصدر: المحاضرة 3 — شريحة 16، المحاضرة 1 — شريحة 45</div>
+  </div>
+ </details>
+</section>
+
+<section class="q" id="q31">
+ <div class="qhead"><span class="num">السؤال 31</span><a class="top" href="#top">↑ للأعلى</a></div>
+ <div class="qtext"><div class="en">Which evidence should be captured before powering off a running machine because it can contain valuable volatile information?</div><div class="ar">أي دليل يجب التقاطه قبل إطفاء جهاز يعمل لأنه قد يحتوي على معلومات متطايرة قيّمة؟</div></div>
+ <div class="opt"><span class="letter">A</span><div class="otext"><div class="en">RAM contents</div><div class="ar">محتويات الذاكرة العشوائية (RAM)</div></div></div><div class="opt"><span class="letter">B</span><div class="otext"><div class="en">Only printed documents</div><div class="ar">فقط المستندات المطبوعة</div></div></div><div class="opt"><span class="letter">C</span><div class="otext"><div class="en">Only backup labels</div><div class="ar">فقط ملصقات النسخ الاحتياطي</div></div></div><div class="opt"><span class="letter">D</span><div class="otext"><div class="en">The empty evidence bags</div><div class="ar">أكياس الأدلة الفارغة</div></div></div>
+ <details class="ans">
+  <summary><span class="t1">اضغط لإظهار الإجابة الصحيحة</span><span class="t2">إخفاء الإجابة</span></summary>
+  <div class="reveal">
+   <span class="lbl">الإجابة الصحيحة</span>
+   <div class="correct"><div class="en">A. RAM contents</div><div class="ar">الخيار A: محتويات الذاكرة العشوائية (RAM)</div></div>
+   <span class="lbl">الشرح من الشابتر</span>
+   <p class="exp ar">التقاط ذاكرة RAM خطوة أساسية قبل إطفاء الجهاز لأنها قد تحتوي على كم كبير من المعلومات (مفاتيح تشفير، سجلات رسائل فورية، عمليات قيد التشغيل، محتوى الحافظة، محتويات غير مشفّرة...). وتصبح عملية التقاط الـ RAM إلزامية في أي تحقيق يتضمن حاسوباً يعمل. وباقي الخيارات ليست معلومات متطايرة.</p>
+   <div class="rabt"><span class="lbl">ربط للفهم والحفظ</span><div class="ar">RAM = ذاكرة «تنطفئ بانطفاء الكهرباء». التقطها قبل أن «تتبخر».</div></div>
+   <div class="src ar">المصدر: المحاضرة 3 — شريحة 17، المحاضرة 2 — شريحة 33، المحاضرة 5 — شريحة 42</div>
+  </div>
+ </details>
+</section>
+
+<section class="q" id="q32">
+ <div class="qhead"><span class="num">السؤال 32</span><a class="top" href="#top">↑ للأعلى</a></div>
+ <div class="qtext"><div class="en">Which is a potential disadvantage of a graceful shutdown during evidence collection?</div><div class="ar">ما العيب المحتمل للإيقاف السلس (Graceful shutdown) أثناء جمع الأدلة؟</div></div>
+ <div class="opt"><span class="letter">A</span><div class="otext"><div class="en">It always prevents applications from writing data</div><div class="ar">أنه يمنع التطبيقات دائماً من كتابة البيانات</div></div></div><div class="opt"><span class="letter">B</span><div class="otext"><div class="en">It can trigger destructive programs configured to run at shutdown</div><div class="ar">أنه قد يُشغّل برامج مدمّرة مضبوطة للعمل عند الإيقاف</div></div></div><div class="opt"><span class="letter">C</span><div class="otext"><div class="en">It guarantees that volatile memory remains intact</div><div class="ar">أنه يضمن بقاء الذاكرة المتطايرة سليمة</div></div></div><div class="opt"><span class="letter">D</span><div class="otext"><div class="en">It eliminates all changes to disk data</div><div class="ar">أنه يلغي جميع التغييرات على بيانات القرص</div></div></div>
+ <details class="ans">
+  <summary><span class="t1">اضغط لإظهار الإجابة الصحيحة</span><span class="t2">إخفاء الإجابة</span></summary>
+  <div class="reveal">
+   <span class="lbl">الإجابة الصحيحة</span>
+   <div class="correct"><div class="en">B. It can trigger destructive programs configured to run at shutdown</div><div class="ar">الخيار B: أنه قد يُشغّل برامج مدمّرة مضبوطة للعمل عند الإيقاف</div></div>
+   <span class="lbl">الشرح من الشابتر</span>
+   <p class="exp ar">مزايا الإيقاف السلس: اكتشاف الملفات والبرامج المفتوحة، ومنع تلف ملفات النظام، والسماح للتطبيقات بكتابة آثارها على القرص لاستعادتها لاحقاً. أما عيوبه: تشغيل برامج مدمّرة مضبوطة للعمل عند الإيقاف، والكتابة فوق بيانات على القرص، وتفعيل سكربتات من المستخدم تزيل سجلات النظام أو تمسح ملف الـ pagefile. الخيار A عكس الميزة، وC خطأ لأن الذاكرة المتطايرة تُفقد عند الإطفاء.</p>
+   <div class="rabt"><span class="lbl">ربط للفهم والحفظ</span><div class="ar">Graceful = «إطفاء مؤدب» لكنه قد يوقظ فخاً: «برنامج مسح» جهّزه المشتبه يعمل عند الإيقاف. أما Hard shutdown (سحب الكهرباء) فيمنع ذلك.</div></div>
+   <div class="src ar">المصدر: المحاضرة 3 — شريحة 20</div>
+  </div>
+ </details>
+</section>
+
+<section class="q" id="q33">
+ <div class="qhead"><span class="num">السؤال 33</span><a class="top" href="#top">↑ للأعلى</a></div>
+ <div class="qtext"><div class="en">What should a first responder do when equipment at the scene exceeds their technical expertise?</div><div class="ar">ماذا ينبغي على المستجيب الأول أن يفعل عندما تتجاوز المعدات في مسرح الجريمة خبرته التقنية؟</div></div>
+ <div class="opt"><span class="letter">A</span><div class="otext"><div class="en">Experiment until the device starts working</div><div class="ar">التجريب حتى يعمل الجهاز</div></div></div><div class="opt"><span class="letter">B</span><div class="otext"><div class="en">Ignore every device at the scene</div><div class="ar">تجاهل كل الأجهزة في المسرح</div></div></div><div class="opt"><span class="letter">C</span><div class="otext"><div class="en">Seek help from an investigator with greater expertise</div><div class="ar">طلب المساعدة من محقق أكثر خبرة</div></div></div><div class="opt"><span class="letter">D</span><div class="otext"><div class="en">Move the running device to another location immediately</div><div class="ar">نقل الجهاز العامل إلى مكان آخر فوراً</div></div></div>
+ <details class="ans">
+  <summary><span class="t1">اضغط لإظهار الإجابة الصحيحة</span><span class="t2">إخفاء الإجابة</span></summary>
+  <div class="reveal">
+   <span class="lbl">الإجابة الصحيحة</span>
+   <div class="correct"><div class="en">C. Seek help from an investigator with greater expertise</div><div class="ar">الخيار C: طلب المساعدة من محقق أكثر خبرة</div></div>
+   <span class="lbl">الشرح من الشابتر</span>
+   <p class="exp ar">إذا احتوى مسرح الجريمة على معدات IT متقدمة تفوق خبرة المستجيب الأول، فعليه طلب المشورة أو المساعدة من محقق أكثر خبرة. كما أن عليه ألا يحرّك جهازاً إلكترونياً وهو يعمل لأن ذلك قد يتلف أو يُفسد الأدلة الرقمية بداخله.</p>
+   <div class="rabt"><span class="lbl">ربط للفهم والحفظ</span><div class="ar">«ما أعرفه أعمله، وما لا أعرفه أسأل عنه». التجريب على الدليل ممنوع.</div></div>
+   <div class="src ar">المصدر: المحاضرة 3 — شريحة 22</div>
+  </div>
+ </details>
+</section>
+
+<section class="q" id="q34">
+ <div class="qhead"><span class="num">السؤال 34</span><a class="top" href="#top">↑ للأعلى</a></div>
+ <div class="qtext"><div class="en">Which evidence source appears first in the order of volatility?</div><div class="ar">أي مصدر للأدلة يظهر أولاً في ترتيب التطاير (Order of volatility)؟</div></div>
+ <div class="opt"><span class="letter">A</span><div class="otext"><div class="en">Backup data and printouts</div><div class="ar">البيانات الاحتياطية والمطبوعات</div></div></div><div class="opt"><span class="letter">B</span><div class="otext"><div class="en">Hard drives and removable storage</div><div class="ar">الأقراص الصلبة ووسائط التخزين القابلة للإزالة</div></div></div><div class="opt"><span class="letter">C</span><div class="otext"><div class="en">Remote logging data</div><div class="ar">بيانات التسجيل عن بُعد</div></div></div><div class="opt"><span class="letter">D</span><div class="otext"><div class="en">CPU registers and system cache</div><div class="ar">سجلات المعالج وذاكرة التخزين المؤقت للنظام (Cache)</div></div></div>
+ <details class="ans">
+  <summary><span class="t1">اضغط لإظهار الإجابة الصحيحة</span><span class="t2">إخفاء الإجابة</span></summary>
+  <div class="reveal">
+   <span class="lbl">الإجابة الصحيحة</span>
+   <div class="correct"><div class="en">D. CPU registers and system cache</div><div class="ar">الخيار D: سجلات المعالج وذاكرة التخزين المؤقت للنظام (Cache)</div></div>
+   <span class="lbl">الشرح من الشابتر</span>
+   <p class="exp ar">ترتيب التطاير من الأكثر إلى الأقل: 1) المعالج والسجلات والكاش، 2) جدول التوجيه وARP cache وجدول العمليات وإحصاءات النواة، 3) ذاكرة RAM، 4) أنظمة الملفات المؤقتة، 5) Swap / pagefile، 6) القرص الصلب والوسائط القابلة للإزالة، 7) بيانات التسجيل والمراقبة عن بُعد، 8) التهيئة المادية وطوبولوجيا الشبكة، 9) البيانات الاحتياطية والمطبوعات.</p>
+   <div class="rabt"><span class="lbl">ربط للفهم والحفظ</span><div class="ar">كلما اقتربت من المعالج زاد التطاير. تخيّل انقطاع الكهرباء: أول من يموت المعالج، ثم الذاكرة، ثم القرص، وآخرها الورق والنسخ الاحتياطية.</div></div>
+   <div class="src ar">المصدر: المحاضرة 3 — الشريحتان 23 و24</div>
+  </div>
+ </details>
+</section>
+
+<section class="q" id="q35">
+ <div class="qhead"><span class="num">السؤال 35</span><a class="top" href="#top">↑ للأعلى</a></div>
+ <div class="qtext"><div class="en">Which order of volatility should be followed when collecting digital evidence?</div><div class="ar">أي ترتيب للتطاير ينبغي اتباعه عند جمع الأدلة الرقمية؟</div></div>
+ <div class="opt"><span class="letter">A</span><div class="otext"><div class="en">Collect most volatile data (RAM) first, then less volatile data (Hard Drive)</div><div class="ar">جمع البيانات الأكثر تطايراً (RAM) أولاً، ثم الأقل تطايراً (القرص الصلب)</div></div></div><div class="opt"><span class="letter">B</span><div class="otext"><div class="en">Collect physical documents first, then RAM</div><div class="ar">جمع المستندات المادية أولاً، ثم RAM</div></div></div><div class="opt"><span class="letter">C</span><div class="otext"><div class="en">Collect backup tapes first, then cache memory</div><div class="ar">جمع أشرطة النسخ الاحتياطي أولاً، ثم ذاكرة الكاش</div></div></div><div class="opt"><span class="letter">D</span><div class="otext"><div class="en">Order of volatility does not matter in evidence collection</div><div class="ar">ترتيب التطاير لا يهم في جمع الأدلة</div></div></div>
+ <details class="ans">
+  <summary><span class="t1">اضغط لإظهار الإجابة الصحيحة</span><span class="t2">إخفاء الإجابة</span></summary>
+  <div class="reveal">
+   <span class="lbl">الإجابة الصحيحة</span>
+   <div class="correct"><div class="en">A. Collect most volatile data (RAM) first, then less volatile data (Hard Drive)</div><div class="ar">الخيار A: جمع البيانات الأكثر تطايراً (RAM) أولاً، ثم الأقل تطايراً (القرص الصلب)</div></div>
+   <span class="lbl">الشرح من الشابتر</span>
+   <p class="exp ar">القاعدة: تُجمع الأدلة من الأكثر تطايراً إلى الأقل تطايراً. الخيار A يمثل هذا المبدأ (RAM المتطايرة ثم القرص غير المتطاير). وللدقة: القائمة في المحاضرة تبدأ بسجلات المعالج والكاش ثم جداول الشبكة ثم RAM، لكن بين هذه الخيارات فقط A يتبع المبدأ. أما B وC فعكس الترتيب (الأقل تطايراً أولاً)، وD خطأ لأن الترتيب هو أساس جمع الأدلة.</p>
+   <div class="rabt"><span class="lbl">ربط للفهم والحفظ</span><div class="ar">«الجليد يذوب»: خذ الأسرع زوالاً أولاً وأجّل الباقي. الأكثر تطايراً أولاً دائماً.</div></div>
+   <div class="src ar">المصدر: المحاضرة 3 — الشريحتان 23 و24</div>
+  </div>
+ </details>
+</section>
+
+<section class="q" id="q36">
+ <div class="qhead"><span class="num">السؤال 36</span><a class="top" href="#top">↑ للأعلى</a></div>
+ <div class="qtext"><div class="en">Which information should be included when documenting who accessed a digital crime scene?</div><div class="ar">ما المعلومات التي ينبغي تضمينها عند توثيق من دخل مسرح جريمة رقمية؟</div></div>
+ <div class="opt"><span class="letter">A</span><div class="otext"><div class="en">Each person&#x27;s name and role</div><div class="ar">اسم كل شخص ودوره</div></div></div><div class="opt"><span class="letter">B</span><div class="otext"><div class="en">Only the total number of visitors</div><div class="ar">فقط العدد الإجمالي للزوار</div></div></div><div class="opt"><span class="letter">C</span><div class="otext"><div class="en">Only the name of the device owner</div><div class="ar">فقط اسم مالك الجهاز</div></div></div><div class="opt"><span class="letter">D</span><div class="otext"><div class="en">Only the final examiner&#x27;s signature</div><div class="ar">فقط توقيع الفاحص الأخير</div></div></div>
+ <details class="ans">
+  <summary><span class="t1">اضغط لإظهار الإجابة الصحيحة</span><span class="t2">إخفاء الإجابة</span></summary>
+  <div class="reveal">
+   <span class="lbl">الإجابة الصحيحة</span>
+   <div class="correct"><div class="en">A. Each person&#x27;s name and role</div><div class="ar">الخيار A: اسم كل شخص ودوره</div></div>
+   <span class="lbl">الشرح من الشابتر</span>
+   <p class="exp ar">من النقاط التي يجب توثيقها بوضوح: متى دخلتَ مسرح الجريمة وكم بقيت ومع من، وتسمية جميع الأشخاص الذين دخلوا المسرح مع ذكر دور كل واحد منهم (مثلاً: من صوّر المسرح؟ من ضبط الجهاز؟ في أي وقت حُصِّل الدليل؟).</p>
+   <div class="rabt"><span class="lbl">ربط للفهم والحفظ</span><div class="ar">«الاسم + الدور» مثل كشف الحضور: من كان موجوداً؟ وماذا فعل؟</div></div>
+   <div class="src ar">المصدر: المحاضرة 3 — شريحة 26</div>
+  </div>
+ </details>
+</section>
+
+<section class="q" id="q37">
+ <div class="qhead"><span class="num">السؤال 37</span><a class="top" href="#top">↑ للأعلى</a></div>
+ <div class="qtext"><div class="en">Which packaging practice helps protect a seized electronic device from electrostatic damage?</div><div class="ar">أي ممارسة في التغليف تساعد على حماية جهاز إلكتروني محجوز من التلف الناتج عن الكهرباء الساكنة؟</div></div>
+ <div class="opt"><span class="letter">A</span><div class="otext"><div class="en">Wrapping it in ordinary paper only</div><div class="ar">لفّه بورق عادي فقط</div></div></div><div class="opt"><span class="letter">B</span><div class="otext"><div class="en">Placing it in an antistatic bag</div><div class="ar">وضعه في كيس مضاد للكهرباء الساكنة</div></div></div><div class="opt"><span class="letter">C</span><div class="otext"><div class="en">Leaving it powered on in an open box</div><div class="ar">تركه يعمل في صندوق مفتوح</div></div></div><div class="opt"><span class="letter">D</span><div class="otext"><div class="en">Removing all identification labels</div><div class="ar">إزالة جميع ملصقات التعريف</div></div></div>
+ <details class="ans">
+  <summary><span class="t1">اضغط لإظهار الإجابة الصحيحة</span><span class="t2">إخفاء الإجابة</span></summary>
+  <div class="reveal">
+   <span class="lbl">الإجابة الصحيحة</span>
+   <div class="correct"><div class="en">B. Placing it in an antistatic bag</div><div class="ar">الخيار B: وضعه في كيس مضاد للكهرباء الساكنة</div></div>
+   <span class="lbl">الشرح من الشابتر</span>
+   <p class="exp ar">في حقيبة المستجيب الأول أكياس مضادة للكهرباء الساكنة (Antistatic bags) للحفاظ على سلامة الدليل. وعند التغليف والنقل: ضع شريطاً لاصقاً على مفتاح التشغيل حتى لا يعمل الجهاز بالخطأ أثناء النقل، وضع الجهاز في كيس مضاد للكهرباء الساكنة، وسجّل اسمك والتاريخ والوقت وأي ملاحظات إضافية. وتُذكر الملصقات اللاصقة (Stick-on labels) ضمن أدوات الحقيبة.</p>
+   <div class="rabt"><span class="lbl">ربط للفهم والحفظ</span><div class="ar">Anti-static = «ضد الشحنة الساكنة»: الاسم يدل على الوظيفة. الورق العادي لا يحمي، والملصقات تبقى للتوثيق.</div></div>
+   <div class="src ar">المصدر: المحاضرة 3 — الشرائح 13 و14 و29</div>
+  </div>
+ </details>
+</section><h2 class="sec" id="sec4">المحاضرة 4 (الجزء 1) — Acquisition and Preservation of Evidence (الاستحواذ وحفظ الأدلة)</h2>
+
+<section class="q" id="q38">
+ <div class="qhead"><span class="num">السؤال 38</span><a class="top" href="#top">↑ للأعلى</a></div>
+ <div class="qtext"><div class="en">Volatile data in digital forensics refers to data that:</div><div class="ar">البيانات المتطايرة (Volatile data) في الأدلة الجنائية الرقمية هي البيانات التي:</div></div>
+ <div class="opt"><span class="letter">A</span><div class="otext"><div class="en">Is lost when the computer is powered off (e.g., RAM)</div><div class="ar">تُفقد عند إطفاء الحاسوب (مثل RAM)</div></div></div><div class="opt"><span class="letter">B</span><div class="otext"><div class="en">Is stored permanently on an optical disc</div><div class="ar">تُخزَّن بشكل دائم على قرص ضوئي</div></div></div><div class="opt"><span class="letter">C</span><div class="otext"><div class="en">Cannot be read by any forensic software</div><div class="ar">لا يمكن قراءتها بأي برنامج جنائي</div></div></div><div class="opt"><span class="letter">D</span><div class="otext"><div class="en">Is written only on paper documentation</div><div class="ar">تُكتب فقط على الوثائق الورقية</div></div></div>
+ <details class="ans">
+  <summary><span class="t1">اضغط لإظهار الإجابة الصحيحة</span><span class="t2">إخفاء الإجابة</span></summary>
+  <div class="reveal">
+   <span class="lbl">الإجابة الصحيحة</span>
+   <div class="correct"><div class="en">A. Is lost when the computer is powered off (e.g., RAM)</div><div class="ar">الخيار A: تُفقد عند إطفاء الحاسوب (مثل RAM)</div></div>
+   <span class="lbl">الشرح من الشابتر</span>
+   <p class="exp ar">تُعدّ البيانات متطايرة عندما تُفقد عند إطفاء الجهاز أو إعادة تشغيله، وقد تُكتب فوقها أثناء الاستخدام العادي (مثلاً عند إغلاق تطبيق تُفرَّغ مساحته من الـ RAM). والذاكرة المتطايرة تحتاج إلى طاقة لتحتفظ بالبيانات ومثالها RAM. أما الذاكرة غير المتطايرة (القرص الصلب، الفلاش، ROM) فتحتفظ بالبيانات بعد الإطفاء.</p>
+   <div class="rabt"><span class="lbl">ربط للفهم والحفظ</span><div class="ar">Volatile = «يتبخّر»: مثل بخار الماء يختفي بمجرد انقطاع الكهرباء.</div></div>
+   <div class="src ar">المصدر: المحاضرة 4 (جزء 1) — شريحة 13، المحاضرة 5 — الشريحتان 36 و37</div>
+  </div>
+ </details>
+</section>
+
+<section class="q" id="q39">
+ <div class="qhead"><span class="num">السؤال 39</span><a class="top" href="#top">↑ للأعلى</a></div>
+ <div class="qtext"><div class="en">Which change can result from using a live RAM acquisition tool?</div><div class="ar">أي تغيير قد ينتج عن استخدام أداة استحواذ حيّ لذاكرة RAM (live RAM acquisition)؟</div></div>
+ <div class="opt"><span class="letter">A</span><div class="otext"><div class="en">Overwriting some data in RAM</div><div class="ar">الكتابة فوق بعض البيانات في الـ RAM</div></div></div><div class="opt"><span class="letter">B</span><div class="otext"><div class="en">Eliminating every registry entry</div><div class="ar">إزالة كل إدخالات الـ Registry</div></div></div><div class="opt"><span class="letter">C</span><div class="otext"><div class="en">Guaranteeing no change to the target machine</div><div class="ar">ضمان عدم حدوث أي تغيير على الجهاز المستهدف</div></div></div><div class="opt"><span class="letter">D</span><div class="otext"><div class="en">Converting the hard drive to read-only hardware</div><div class="ar">تحويل القرص الصلب إلى عتاد للقراءة فقط</div></div></div>
+ <details class="ans">
+  <summary><span class="t1">اضغط لإظهار الإجابة الصحيحة</span><span class="t2">إخفاء الإجابة</span></summary>
+  <div class="reveal">
+   <span class="lbl">الإجابة الصحيحة</span>
+   <div class="correct"><div class="en">A. Overwriting some data in RAM</div><div class="ar">الخيار A: الكتابة فوق بعض البيانات في الـ RAM</div></div>
+   <span class="lbl">الشرح من الشابتر</span>
+   <p class="exp ar">الاستحواذ الحي يُحدث عادةً التعديلات التالية على أي جهاز ويندوز: 1) تغييرات في الـ Registry، 2) إدخالات في الذاكرة (الكتابة فوق بيانات في RAM)، 3) قد يكتب كمية صغيرة جداً من البيانات على القرص. والمحاكم عادةً متسامحة مع هذه الآثار الصغيرة إذا وُثِّقت (وتوثيق الأداة في التقرير تؤكده المحاضرة 2).</p>
+   <div class="rabt"><span class="lbl">ربط للفهم والحفظ</span><div class="ar">Live = «حيّ»: لمسك للجهاز الحي يترك «بصمة صغيرة» (Footprint): Registry + ذاكرة + قرص قليل. وثّقها وتُقبل.</div></div>
+   <div class="src ar">المصدر: المحاضرة 4 (جزء 1) — شريحة 19، المحاضرة 2 — شريحة 33</div>
+  </div>
+ </details>
+</section>
+
+<section class="q" id="q40">
+ <div class="qhead"><span class="num">السؤال 40</span><a class="top" href="#top">↑ للأعلى</a></div>
+ <div class="qtext"><div class="en">Hash values (such as MD5 or SHA-256) are used in digital forensics primarily to:</div><div class="ar">تُستخدم قيم التجزئة (Hash) مثل MD5 أو SHA-256 في الأدلة الجنائية الرقمية بشكل أساسي من أجل:</div></div>
+ <div class="opt"><span class="letter">A</span><div class="otext"><div class="en">Verify data integrity and prove evidence has not been altered</div><div class="ar">التحقق من سلامة البيانات وإثبات أن الدليل لم يتم تغييره</div></div></div><div class="opt"><span class="letter">B</span><div class="otext"><div class="en">Recover lost network passwords</div><div class="ar">استعادة كلمات مرور الشبكة المفقودة</div></div></div><div class="opt"><span class="letter">C</span><div class="otext"><div class="en">Clean viruses from the suspect drive</div><div class="ar">تنظيف الفيروسات من قرص المشتبه به</div></div></div><div class="opt"><span class="letter">D</span><div class="otext"><div class="en">Speed up system boot time</div><div class="ar">تسريع زمن إقلاع النظام</div></div></div>
+ <details class="ans">
+  <summary><span class="t1">اضغط لإظهار الإجابة الصحيحة</span><span class="t2">إخفاء الإجابة</span></summary>
+  <div class="reveal">
+   <span class="lbl">الإجابة الصحيحة</span>
+   <div class="correct"><div class="en">A. Verify data integrity and prove evidence has not been altered</div><div class="ar">الخيار A: التحقق من سلامة البيانات وإثبات أن الدليل لم يتم تغييره</div></div>
+   <span class="lbl">الشرح من الشابتر</span>
+   <p class="exp ar">التجزئة (Hashing) هي المعيار المقبول للتحقق من صور الأدلة: تضمن أن الصورة المستحوَذة مطابقة 100% للمصدر ولم تتغير أثناء الاستحواذ، وتُعدّ بصمة إلكترونية للملف. وأشهر الخوارزميات MD5 وSHA-256. وتُستخدم مرتين: قبل بدء التحليل (للتحقق وعمل النسخ) وفي نهاية الفحص (للتحقق من سلامة البيانات ومعالجتها).</p>
+   <div class="rabt"><span class="lbl">ربط للفهم والحفظ</span><div class="ar">Hash = «بصمة الإصبع الرقمية»: تغيّر بت واحد فقط تتغيّر البصمة كلها فيُكشف التلاعب. تُؤخذ مرتين: في البداية وفي النهاية.</div></div>
+   <div class="src ar">المصدر: المحاضرة 4 (جزء 1) — الشرائح 9–12</div>
+  </div>
+ </details>
+</section>
+
+<section class="q" id="q41">
+ <div class="qhead"><span class="num">السؤال 41</span><a class="top" href="#top">↑ للأعلى</a></div>
+ <div class="qtext"><div class="en">Which forensic image format commonly uses extensions such as .E01 and .E02?</div><div class="ar">أي صيغة لصورة الأدلة الجنائية تستخدم عادةً امتدادات مثل .E01 و.E02؟</div></div>
+ <div class="opt"><span class="letter">A</span><div class="otext"><div class="en">Raw</div><div class="ar">الصيغة الخام (Raw)</div></div></div><div class="opt"><span class="letter">B</span><div class="otext"><div class="en">AFF</div><div class="ar">صيغة AFF</div></div></div><div class="opt"><span class="letter">C</span><div class="otext"><div class="en">Expert Witness (EnCase)</div><div class="ar">صيغة Expert Witness (EnCase)</div></div></div><div class="opt"><span class="letter">D</span><div class="otext"><div class="en">Plain text</div><div class="ar">نص عادي (Plain text)</div></div></div>
+ <details class="ans">
+  <summary><span class="t1">اضغط لإظهار الإجابة الصحيحة</span><span class="t2">إخفاء الإجابة</span></summary>
+  <div class="reveal">
+   <span class="lbl">الإجابة الصحيحة</span>
+   <div class="correct"><div class="en">C. Expert Witness (EnCase)</div><div class="ar">الخيار C: صيغة Expert Witness (EnCase)</div></div>
+   <span class="lbl">الشرح من الشابتر</span>
+   <p class="exp ar">صيغة Expert Witness هي الصيغة التي تنشئها أداة «EnCase Forensic»، وهي قابلة للضغط والبحث، ويمكن تقسيم الصورة الناتجة إلى عدة ملفات، وامتدادها .E01 و.E02. أما الصيغة الخام (Raw) فامتداداتها 001 وdd وdmg وraw وimg، وصيغة AFF مفتوحة المصدر وتدعم الضغط zlib وLZMA.</p>
+   <div class="rabt"><span class="lbl">ربط للفهم والحفظ</span><div class="ar">E01 = «E» من EnCase. الحرف E يدلّك على الأداة والصيغة.</div></div>
+   <div class="src ar">المصدر: المحاضرة 4 (جزء 1) — الشرائح 5 و7 و8</div>
+  </div>
+ </details>
+</section>
+
+<section class="q" id="q42">
+ <div class="qhead"><span class="num">السؤال 42</span><a class="top" href="#top">↑ للأعلى</a></div>
+ <div class="qtext"><div class="en">What is a primary objective of acquiring a bit-stream image of a drive?</div><div class="ar">ما الهدف الأساسي من استحواذ صورة بت-ستريم (bit-stream image) لقرص؟</div></div>
+ <div class="opt"><span class="letter">A</span><div class="otext"><div class="en">To capture an exact sector-by-sector replica including deleted data</div><div class="ar">التقاط نسخة طبق الأصل قطاعاً بقطاع تشمل البيانات المحذوفة</div></div></div><div class="opt"><span class="letter">B</span><div class="otext"><div class="en">To compress files for regular backup</div><div class="ar">ضغط الملفات للنسخ الاحتياطي الاعتيادي</div></div></div><div class="opt"><span class="letter">C</span><div class="otext"><div class="en">To install system updates on the drive</div><div class="ar">تثبيت تحديثات النظام على القرص</div></div></div><div class="opt"><span class="letter">D</span><div class="otext"><div class="en">To encrypt the drive permanently</div><div class="ar">تشفير القرص بشكل دائم</div></div></div>
+ <details class="ans">
+  <summary><span class="t1">اضغط لإظهار الإجابة الصحيحة</span><span class="t2">إخفاء الإجابة</span></summary>
+  <div class="reveal">
+   <span class="lbl">الإجابة الصحيحة</span>
+   <div class="correct"><div class="en">A. To capture an exact sector-by-sector replica including deleted data</div><div class="ar">الخيار A: التقاط نسخة طبق الأصل قطاعاً بقطاع تشمل البيانات المحذوفة</div></div>
+   <span class="lbl">الشرح من الشابتر</span>
+   <p class="exp ar">الاستحواذ المادي (Physical acquisition) ويُعرف أيضاً بصورة bit-stream: نسخة بت ببت / قطاع بقطاع من القرص، وتُلتقط فيها بيانات وصف نظام الملفات والملفات المحذوفة وبقاياها والمساحة غير المخصصة. والصورة الناتجة نسخة كاملة من المصدر؛ فقرص 500GB ينتج صورة 500GB ما لم يُستخدم الضغط.</p>
+   <div class="rabt"><span class="lbl">ربط للفهم والحفظ</span><div class="ar">Bit-stream = «تصوير القرص كاملاً» بما فيه المحذوف، مثل نسخ كتاب بكل صفحاته حتى الممزّقة.</div></div>
+   <div class="src ar">المصدر: المحاضرة 4 (جزء 1) — شريحة 25</div>
+  </div>
+ </details>
+</section>
+
+<section class="q" id="q43">
+ <div class="qhead"><span class="num">السؤال 43</span><a class="top" href="#top">↑ للأعلى</a></div>
+ <div class="qtext"><div class="en">Which acquisition method captures a sector-by-sector copy including unallocated space and deleted-file fragments?</div><div class="ar">أي طريقة استحواذ تلتقط نسخة قطاعاً بقطاع تشمل المساحة غير المخصصة وبقايا الملفات المحذوفة؟</div></div>
+ <div class="opt"><span class="letter">A</span><div class="otext"><div class="en">Logical acquisition</div><div class="ar">الاستحواذ المنطقي (Logical acquisition)</div></div></div><div class="opt"><span class="letter">B</span><div class="otext"><div class="en">Physical acquisition</div><div class="ar">الاستحواذ المادي (Physical acquisition)</div></div></div><div class="opt"><span class="letter">C</span><div class="otext"><div class="en">A screenshot of the desktop</div><div class="ar">لقطة شاشة لسطح المكتب</div></div></div><div class="opt"><span class="letter">D</span><div class="otext"><div class="en">Copying only visible documents</div><div class="ar">نسخ المستندات المرئية فقط</div></div></div>
+ <details class="ans">
+  <summary><span class="t1">اضغط لإظهار الإجابة الصحيحة</span><span class="t2">إخفاء الإجابة</span></summary>
+  <div class="reveal">
+   <span class="lbl">الإجابة الصحيحة</span>
+   <div class="correct"><div class="en">B. Physical acquisition</div><div class="ar">الخيار B: الاستحواذ المادي (Physical acquisition)</div></div>
+   <span class="lbl">الشرح من الشابتر</span>
+   <p class="exp ar">الاستحواذ المادي ينسخ القرص بت ببت / قطاعاً بقطاع ويشمل المساحة غير المخصصة وبقايا الملفات المحذوفة. أما الاستحواذ المنطقي فيلتقط مجموعة محددة من البيانات النشطة فقط، ولا يلتقط المساحة غير المخصصة ولا الملفات المحذوفة أو المخفية. مثال: قرص 500GB فيه 100GB بيانات نشطة، فالمنطقي يصوّر 100GB فقط.</p>
+   <div class="rabt"><span class="lbl">ربط للفهم والحفظ</span><div class="ar">Physical = «كل شيء» (حتى المحذوف). Logical = «المرئي فقط» الذي أمامك.</div></div>
+   <div class="src ar">المصدر: المحاضرة 4 (جزء 1) — الشريحتان 25 و28</div>
+  </div>
+ </details>
+</section>
+
+<section class="q" id="q44">
+ <div class="qhead"><span class="num">السؤال 44</span><a class="top" href="#top">↑ للأعلى</a></div>
+ <div class="qtext"><div class="en">How does sparse acquisition differ from acquiring only selected active files?</div><div class="ar">كيف يختلف الاستحواذ المتفرّق (Sparse acquisition) عن الاستحواذ على ملفات نشطة مختارة فقط؟</div></div>
+ <div class="noopt">ملاحظة: خيارات هذا السؤال لم تُرفق في الملف الأصلي، والمرفق هو الإجابة الصحيحة فقط، وهي تظهر عند الضغط على الزر أدناه.</div>
+ <details class="ans">
+  <summary><span class="t1">اضغط لإظهار الإجابة الصحيحة</span><span class="t2">إخفاء الإجابة</span></summary>
+  <div class="reveal">
+   <span class="lbl">الإجابة الصحيحة</span>
+   <div class="correct"><div class="en">Option C: It also acquires deleted data and fragments</div><div class="ar">الخيار C: أنه يستحوذ أيضاً على البيانات المحذوفة وبقاياها (Fragments)</div></div>
+   <span class="lbl">الشرح من الشابتر</span>
+   <p class="exp ar">الاستحواذ المتفرّق يشبه الاستحواذ المنطقي لأنه يلتقط ملفات محددة مرتبطة بالقضية فقط، لكنه في المقابل يلتقط أيضاً البيانات المحذوفة وبقاياها أثناء عملية الالتقاط. أما الاستحواذ المنطقي (ملفات نشطة مختارة) فلا يلتقط المحذوف.</p>
+   <div class="rabt"><span class="lbl">ربط للفهم والحفظ</span><div class="ar">Sparse = Logical + المحذوف: «انتقائي لكنه لا يترك المحذوف».</div></div>
+   <div class="src ar">المصدر: المحاضرة 4 (جزء 1) — الشريحتان 28 و30</div>
+  </div>
+ </details>
+</section><h2 class="sec" id="sec5">المحاضرة 4 (الجزء 2) — Antiforensics Techniques (تقنيات مقاومة التحقيق الجنائي)</h2>
+
+<section class="q" id="q45">
+ <div class="qhead"><span class="num">السؤال 45</span><a class="top" href="#top">↑ للأعلى</a></div>
+ <div class="qtext"><div class="en">What is digital steganography?</div><div class="ar">ما هي الإخفائية الرقمية (Digital steganography)؟</div></div>
+ <div class="noopt">ملاحظة: خيارات هذا السؤال لم تُرفق في الملف الأصلي، والمرفق هو الإجابة الصحيحة فقط، وهي تظهر عند الضغط على الزر أدناه.</div>
+ <details class="ans">
+  <summary><span class="t1">اضغط لإظهار الإجابة الصحيحة</span><span class="t2">إخفاء الإجابة</span></summary>
+  <div class="reveal">
+   <span class="lbl">الإجابة الصحيحة</span>
+   <div class="correct"><div class="en">Option A: Concealing a secret message within an ordinary carrier file</div><div class="ar">الخيار A: إخفاء رسالة سرية داخل ملف حامل (Carrier) عادي</div></div>
+   <span class="lbl">الشرح من الشابتر</span>
+   <p class="exp ar">الـ Steganography هي علم إخفاء رسالة سرية داخل ملف عادي «بريء» للحفاظ على سريتها أثناء التسليم. ومعظم التقنيات لا تغيّر مظهر الملف الحامل فلا يكتشفه المراقب. تُصنَّف حسب الملف الحامل إلى: نص، صورة، صوت وفيديو، وشبكة؛ وطرق التضمين ثلاث: الحقن (Injection) والاستبدال (Substitution) والتوليد (Generation).</p>
+   <div class="rabt"><span class="lbl">ربط للفهم والحفظ</span><div class="ar">Stego = «مخفي»: رسالة سرّية داخل صورة عادية، مثل كتابة بحبر سري داخل لوحة جميلة لا يشك فيها أحد.</div></div>
+   <div class="src ar">المصدر: المحاضرة 4 (جزء 2) — الشرائح 7 و9 و10–12</div>
+  </div>
+ </details>
+</section>
+
+<section class="q" id="q46">
+ <div class="qhead"><span class="num">السؤال 46</span><a class="top" href="#top">↑ للأعلى</a></div>
+ <div class="qtext"><div class="en">What is a primary aim of antiforensics techniques?</div><div class="ar">ما الهدف الأساسي لتقنيات مقاومة التحقيق الجنائي (Antiforensics)؟</div></div>
+ <div class="opt"><span class="letter">A</span><div class="otext"><div class="en">To make evidence easier to authenticate</div><div class="ar">جعل الأدلة أسهل في التوثيق والمصادقة</div></div></div><div class="opt"><span class="letter">B</span><div class="otext"><div class="en">To guarantee faster forensic analysis</div><div class="ar">ضمان تحليل جنائي أسرع</div></div></div><div class="opt"><span class="letter">C</span><div class="otext"><div class="en">To replace the need for evidence preservation</div><div class="ar">إلغاء الحاجة إلى حفظ الأدلة</div></div></div><div class="opt"><span class="letter">D</span><div class="otext"><div class="en">To destroy or conceal digital evidence</div><div class="ar">إتلاف الأدلة الرقمية أو إخفاؤها</div></div></div>
+ <details class="ans">
+  <summary><span class="t1">اضغط لإظهار الإجابة الصحيحة</span><span class="t2">إخفاء الإجابة</span></summary>
+  <div class="reveal">
+   <span class="lbl">الإجابة الصحيحة</span>
+   <div class="correct"><div class="en">D. To destroy or conceal digital evidence</div><div class="ar">الخيار D: إتلاف الأدلة الرقمية أو إخفاؤها</div></div>
+   <span class="lbl">الشرح من الشابتر</span>
+   <p class="exp ar">تهدف تقنيات Antiforensics إلى إتلاف الدليل الرقمي أو إخفائه، فتُحبط المحققين وتزيد الوقت اللازم للتحليل الأولي. وهي مجموعة تقنيات لمحاربة التحليل الجنائي وتضليل التحقيقات. وأصنافها الخمسة: إخفاء البيانات (Steganography)، إتلاف البيانات، التشفير، إخفاء الهوية، ومهاجمة أدوات التحقيق.</p>
+   <div class="rabt"><span class="lbl">ربط للفهم والحفظ</span><div class="ar">Anti = «ضد». هي ضد التحقيق فهدفها «اخفِ أو أتلف». أي خيار فيه «أسهل / أسرع» خطأ.</div></div>
+   <div class="src ar">المصدر: المحاضرة 4 (جزء 2) — الشرائح 3 و4 و6</div>
+  </div>
+ </details>
+</section>
+
+<section class="q" id="q47">
+ <div class="qhead"><span class="num">السؤال 47</span><a class="top" href="#top">↑ للأعلى</a></div>
+ <div class="qtext"><div class="en">Why can manipulation of file timestamps mislead a forensic investigation?</div><div class="ar">لماذا قد يؤدي التلاعب بالطوابع الزمنية للملفات إلى تضليل التحقيق الجنائي؟</div></div>
+ <div class="opt"><span class="letter">A</span><div class="otext"><div class="en">Timestamps always contain encryption keys</div><div class="ar">لأن الطوابع الزمنية تحتوي دائماً على مفاتيح تشفير</div></div></div><div class="opt"><span class="letter">B</span><div class="otext"><div class="en">Timestamps determine the physical size of RAM</div><div class="ar">لأن الطوابع الزمنية تحدد الحجم المادي للـ RAM</div></div></div><div class="opt"><span class="letter">C</span><div class="otext"><div class="en">Investigators use metadata to narrow searches to a relevant timeframe</div><div class="ar">لأن المحققين يستخدمون البيانات الوصفية (Metadata) لحصر البحث ضمن إطار زمني ذي صلة</div></div></div><div class="opt"><span class="letter">D</span><div class="otext"><div class="en">Timestamps automatically reveal the real identity of every user</div><div class="ar">لأن الطوابع الزمنية تكشف تلقائياً الهوية الحقيقية لكل مستخدم</div></div></div>
+ <details class="ans">
+  <summary><span class="t1">اضغط لإظهار الإجابة الصحيحة</span><span class="t2">إخفاء الإجابة</span></summary>
+  <div class="reveal">
+   <span class="lbl">الإجابة الصحيحة</span>
+   <div class="correct"><div class="en">C. Investigators use metadata to narrow searches to a relevant timeframe</div><div class="ar">الخيار C: لأن المحققين يستخدمون البيانات الوصفية (Metadata) لحصر البحث ضمن إطار زمني ذي صلة</div></div>
+   <span class="lbl">الشرح من الشابتر</span>
+   <p class="exp ar">تساعد البيانات الوصفية (Metadata) المحققين على حصر بحثهم في إطار زمني مرتبط بالقضية (قبل وقوع الحادثة أو بعدها). لذلك إذا غيّر المشتبه به قيم الطوابع الزمنية الأربعة لأي ملف في نظام NTFS (File created، File accessed، File modified، MFT last written) ضُلّل التحقيق وضاع الإطار الزمني الصحيح.</p>
+   <div class="rabt"><span class="lbl">ربط للفهم والحفظ</span><div class="ar">«الزمن هو الخريطة»: من يعبث بالساعة يضيّع المحقق. والطوابع الأربعة: أُنشئ، دُخل، عُدّل، MFT كُتب.</div></div>
+   <div class="src ar">المصدر: المحاضرة 4 (جزء 2) — شريحة 21</div>
+  </div>
+ </details>
+</section>
+
+<section class="q" id="q48">
+ <div class="qhead"><span class="num">السؤال 48</span><a class="top" href="#top">↑ للأعلى</a></div>
+ <div class="qtext"><div class="en">Which Windows NTFS feature enables encryption on an individual file or folder basis?</div><div class="ar">أي ميزة في نظام ملفات Windows NTFS تتيح التشفير على مستوى الملف أو المجلد الفردي؟</div></div>
+ <div class="noopt">ملاحظة: خيارات هذا السؤال لم تُرفق في الملف الأصلي، والمرفق هو الإجابة الصحيحة فقط، وهي تظهر عند الضغط على الزر أدناه.</div>
+ <details class="ans">
+  <summary><span class="t1">اضغط لإظهار الإجابة الصحيحة</span><span class="t2">إخفاء الإجابة</span></summary>
+  <div class="reveal">
+   <span class="lbl">الإجابة الصحيحة</span>
+   <div class="correct"><div class="en">D. Encrypting File System (EFS)</div><div class="ar">الخيار D: نظام تشفير الملفات (EFS)</div></div>
+   <span class="lbl">الشرح من الشابتر</span>
+   <p class="exp ar">EFS (Encrypting File System) ميزة في نظام ملفات Windows NTFS تتيح للمستخدم تفعيل التشفير على مستوى كل ملف أو مجلد. وتختلف عن تشفير القرص بالكامل FDE وأشهره BitLocker، الذي يشفّر كل بت على القرص ويستخدم خوارزمية AES (ابتداءً من Windows Vista).</p>
+   <div class="rabt"><span class="lbl">ربط للفهم والحفظ</span><div class="ar">EFS = Encrypting «FILE» System: حرف F = File = تشفير ملف أو مجلد. أما BitLocker فيشفّر القرص كله.</div></div>
+   <div class="src ar">المصدر: المحاضرة 4 (جزء 2) — الشريحتان 23 و25</div>
+  </div>
+ </details>
+</section>
+ 
+<section class="info notes ar">
+ <b>ملاحظات التحقق من الإجابات</b>
+ <ul>
+  <li>تمت مطابقة كل إجابة مع شرائح المحاضرات (1، 2، 3، 4 جزء 1، 4 جزء 2، 5)، وكلها صحيحة. رقم الشريحة مذكور تحت كل إجابة.</li>
+  <li>لا تحفظ حرف الإجابة (A أو B...) بل المعنى؛ ففي الملف المرفق لمجموعة الأسئلة الثلاثين كانت كل الإجابات الصحيحة هي A، وفي الاختبار الحقيقي قد يختلف الترتيب.</li>
+  <li>أسئلة لا يرد نصّها حرفياً في الشرائح، وتم توضيح ذلك داخل الشرح: «Incident Response team» (معلومة عامة)، «slack space» (الشرائح تذكر المصطلح فقط)، «write blocker» (الشرائح تذكر مبدأ الحماية من الكتابة)، «documentation» (المعنى مطابق).</li>
+  <li>ثلاثة أسئلة لم تُرفق خياراتها في الملفات الأصلية (الإخفائية الرقمية، الاستحواذ المتفرّق، EFS)، فتم عرض السؤال والإجابة الصحيحة المرفقة فقط دون اختراع خيارات.</li>
+  <li>تم حذف التكرار: الأسئلة التي تكررت في أكثر من ملف ظهرت مرة واحدة فقط.</li>
+ </ul>
+</section>
+
+</div>
+<script>
+document.getElementById('showAll').addEventListener('click',function(){document.querySelectorAll('details.ans').forEach(function(d){d.open=true;});});
+(function(){
+ var bar=document.getElementById('qbar'),row=document.getElementById('qrow');
+ var cards=[].slice.call(document.querySelectorAll('.q'));
+ var links={};[].forEach.call(row.querySelectorAll('a[href^="#q"]'),function(a){links[a.getAttribute('href').slice(1)]=a;});
+ var cur=null,tick=false;
+ function update(){
+  tick=false;
+  var y=bar.getBoundingClientRect().height+24,pick=cards[0];
+  for(var i=0;i<cards.length;i++){ if(cards[i].getBoundingClientRect().top<=y){pick=cards[i];} else break; }
+  if(window.scrollY<80){pick=null;}
+  var a=pick?links[pick.id]:null;
+  if(a===cur)return;
+  if(cur)cur.classList.remove('active');
+  cur=a;
+  if(a){a.classList.add('active');
+   var r=a.getBoundingClientRect(),b=row.getBoundingClientRect();
+   row.scrollBy({left:(r.left+r.width/2)-(b.left+b.width/2),behavior:'smooth'});}
+ }
+ window.addEventListener('scroll',function(){if(!tick){tick=true;requestAnimationFrame(update);}},{passive:true});
+ update();
+})();
+document.getElementById('hideAll').addEventListener('click',function(){document.querySelectorAll('details.ans').forEach(function(d){d.open=false;});});
+</script>
+</body>
+</html>
